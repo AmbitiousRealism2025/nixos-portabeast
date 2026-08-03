@@ -62,6 +62,28 @@
     xwayland.enable = true;
   };
 
+  # Make backend selection deterministic for both installed desktops. Plasma
+  # keeps its KDE/KWallet integration; Hyprland uses XDPH for compositor-aware
+  # interfaces and GTK as the general fallback.
+  xdg.portal.config = {
+    kde = {
+      default = [ "kde" ];
+      "org.freedesktop.impl.portal.Settings" = [
+        "kde"
+        "gtk"
+      ];
+      "org.freedesktop.impl.portal.Secret" = [ "kwallet" ];
+    };
+    hyprland = {
+      default = [
+        "hyprland"
+        "gtk"
+      ];
+      "org.freedesktop.impl.portal.Secret" = [ "kwallet" ];
+    };
+    common.default = [ "gtk" ];
+  };
+
   services.printing.enable = true;
 
   services.pulseaudio.enable = false;

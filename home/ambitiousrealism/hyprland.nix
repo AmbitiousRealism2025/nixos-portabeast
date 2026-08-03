@@ -52,7 +52,14 @@ in
     brightnessctl
     fuzzel
   ];
-  home.sessionVariables.TERMINAL = "konsole";
+  home.sessionVariables.TERMINAL = "kitty";
+
+  programs.kitty = {
+    enable = true;
+    settings = {
+      confirm_os_window_close = 0;
+    };
+  };
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -94,9 +101,9 @@ in
       };
 
       bind = [
-        # Applications: keep the proven Plasma applications in this minimal
-        # session. Kitty and DMS replace these temporary choices later.
-        (mkExecBind "SUPER + RETURN" "uwsm app -- /run/current-system/sw/bin/konsole")
+        # Applications: Kitty now owns the Omarchy-compatible terminal binding.
+        # Firefox and Fuzzel remain the proven temporary browser and launcher.
+        (mkExecBind "SUPER + RETURN" "uwsm app -- ${pkgs.kitty}/bin/kitty")
         (mkExecBind "SUPER + SHIFT + RETURN" "uwsm app -- /run/current-system/sw/bin/firefox")
         (mkExecBind "SUPER + SPACE" "uwsm app -- ${pkgs.fuzzel}/bin/fuzzel")
 
