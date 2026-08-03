@@ -46,8 +46,7 @@ let
   ) (lib.range 1 9);
 in
 {
-  # Fuzzel is a temporary lightweight launcher until DMS Spotlight is added
-  # and tested in its own generation.
+  # Fuzzel remains a lightweight recovery launcher while DMS is being tested.
   home.packages = with pkgs; [
     brightnessctl
     fuzzel
@@ -101,11 +100,21 @@ in
       };
 
       bind = [
-        # Applications: Kitty now owns the Omarchy-compatible terminal binding.
-        # Firefox and Fuzzel remain the proven temporary browser and launcher.
+        # Applications: Kitty and Firefox retain their proven bindings. DMS
+        # Spotlight becomes the primary launcher, with Fuzzel one chord away
+        # as a shell-independent recovery fallback.
         (mkExecBind "SUPER + RETURN" "uwsm app -- ${pkgs.kitty}/bin/kitty")
         (mkExecBind "SUPER + SHIFT + RETURN" "uwsm app -- /run/current-system/sw/bin/firefox")
-        (mkExecBind "SUPER + SPACE" "uwsm app -- ${pkgs.fuzzel}/bin/fuzzel")
+        (mkExecBind "SUPER + SPACE" "${pkgs.dms-shell}/bin/dms ipc call spotlight toggle")
+        (mkExecBind "SUPER + SHIFT + SPACE" "uwsm app -- ${pkgs.fuzzel}/bin/fuzzel")
+
+        # Omarchy-shaped shell controls, translated to DMS 1.4.6 IPC methods
+        # verified from the package in the pinned NixOS release.
+        (mkExecBind "SUPER + ALT + SPACE" "${pkgs.dms-shell}/bin/dms ipc call settings focusOrToggle")
+        (mkExecBind "SUPER + ESCAPE" "${pkgs.dms-shell}/bin/dms ipc call powermenu toggle")
+        (mkExecBind "SUPER + CTRL + L" "${pkgs.dms-shell}/bin/dms ipc call lock lock")
+        (mkExecBind "SUPER + CTRL + V" "${pkgs.dms-shell}/bin/dms ipc call clipboard toggle")
+        (mkExecBind "SUPER + CTRL + SPACE" "${pkgs.dms-shell}/bin/dms ipc call dankdash wallpaper")
 
         # Omarchy-compatible tiling and focus muscle memory.
         (mkNativeBind "SUPER + W" "hl.dsp.window.close()")

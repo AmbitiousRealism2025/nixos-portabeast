@@ -73,6 +73,50 @@
     xwayland.enable = true;
   };
 
+  # Install DMS without its generic graphical-session service. That upstream
+  # target is also active in Plasma, and the packaged unit's ordering does not
+  # fit UWSM's earlier compositor target. A Hyprland-specific unit below starts
+  # in UWSM's later XDG-autostart phase instead. DMS Greeter remains disabled;
+  # SDDM still owns login.
+  programs.dms-shell = {
+    enable = true;
+    systemd.enable = false;
+
+    # Keep the first DMS layer focused on the shell/control surfaces that are
+    # being tested. Calendar and visualizer integrations can be added later in
+    # separate, reviewable generations.
+    enableAudioWavelength = false;
+    enableCalendarEvents = false;
+  };
+
+  systemd.user.services.dms = {
+    description = "Dank Material Shell (Hyprland UWSM session only)";
+    after = [
+      "wayland-session@hyprland.desktop.target"
+      "graphical-session.target"
+    ];
+    partOf = [ "wayland-session@hyprland.desktop.target" ];
+    wantedBy = [ "wayland-session-xdg-autostart@hyprland.desktop.target" ];
+    restartIfChanged = true;
+    # DMS launches several optional helpers by name. Give its service the same
+    # declarative system path that contains dgop, matugen, NetworkManager,
+    # wtype, and the normal session utilities installed by the module.
+    path = [ config.system.path ];
+    unitConfig = {
+      ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
+      Requisite = "wayland-session@hyprland.desktop.target";
+    };
+    serviceConfig = {
+      Type = "dbus";
+      BusName = "org.freedesktop.Notifications";
+      ExecStart = "${pkgs.dms-shell}/bin/dms run --session";
+      ExecReload = "${pkgs.procps}/bin/pkill -USR1 -x dms";
+      Restart = "on-failure";
+      RestartSec = 1.23;
+      TimeoutStopSec = 10;
+    };
+  };
+
   # Make backend selection deterministic for both installed desktops. Plasma
   # keeps its KDE/KWallet integration; Hyprland uses XDPH for compositor-aware
   # interfaces and GTK as the general fallback.
