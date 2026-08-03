@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports = [ ./hardware-configuration.nix ];
@@ -53,6 +58,12 @@
     layout = "us";
     variant = "";
   };
+
+  # Plasma enables a system-wide DrKonqi handoff for every systemd coredump.
+  # During UWSM teardown its GUI launcher has no display and can coredump
+  # recursively. Keep systemd-coredump and coredumpctl, but disable this
+  # automatic GUI handoff until the upstream lifecycle bug is resolved.
+  systemd.services."drkonqi-coredump-processor@".wantedBy = lib.mkForce [ ];
 
   # Add Hyprland beside Plasma in SDDM. UWSM is the sole primary session
   # manager; the direct Hyprland entry remains available for recovery.
