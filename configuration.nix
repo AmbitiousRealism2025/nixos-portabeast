@@ -54,6 +54,14 @@
     variant = "";
   };
 
+  # Add Hyprland beside Plasma in SDDM. UWSM is the sole primary session
+  # manager; the direct Hyprland entry remains available for recovery.
+  programs.hyprland = {
+    enable = true;
+    withUWSM = true;
+    xwayland.enable = true;
+  };
+
   services.printing.enable = true;
 
   services.pulseaudio.enable = false;

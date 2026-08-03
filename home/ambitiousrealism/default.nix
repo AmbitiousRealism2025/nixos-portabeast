@@ -1,7 +1,10 @@
 { pkgs, ... }:
 
 {
-  imports = [ ./shell.nix ];
+  imports = [
+    ./hyprland.nix
+    ./shell.nix
+  ];
 
   home = {
     username = "ambitiousrealism";
