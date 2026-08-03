@@ -11,12 +11,19 @@
       url = "github:nix-community/home-manager/d4fd24667c8cbef124bb70a20380cab75ec8474d";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Persist the community desktop wrapper and pin the same official Codex
+    # CLI version that was proven during bootstrap.
+    codex-desktop-linux.url = "github:ilysenko/codex-desktop-linux";
+    codex-nixpkgs.url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1046984.104240a77242/nixexprs.tar.xz";
   };
 
   outputs =
     {
       nixpkgs,
       home-manager,
+      codex-desktop-linux,
+      codex-nixpkgs,
       ...
     }:
     {
@@ -28,6 +35,14 @@
         modules = [
           ./configuration.nix
           home-manager.nixosModules.home-manager
+          codex-desktop-linux.nixosModules.default
+          {
+            environment.systemPackages = [ codex-nixpkgs.legacyPackages.x86_64-linux.codex ];
+            programs.codexDesktopLinux = {
+              enable = true;
+              cliPackage = codex-nixpkgs.legacyPackages.x86_64-linux.codex;
+            };
+          }
         ];
       };
 
