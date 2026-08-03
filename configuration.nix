@@ -68,11 +68,21 @@
   users.users.ambitiousrealism = {
     isNormalUser = true;
     description = "Sean Murphy";
+    shell = pkgs.zsh;
     extraGroups = [
       "networkmanager"
       "wheel"
     ];
     packages = with pkgs; [ kdePackages.kate ];
+  };
+
+  # NixOS owns the login shell and Home Manager owns the interactive Zsh
+  # configuration. No Fish package or Fish state is imported.
+  programs.zsh.enable = true;
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.ambitiousrealism = import ./home/ambitiousrealism;
   };
 
   programs.firefox.enable = true;
