@@ -27,6 +27,15 @@
   # Enable networking
   networking.networkmanager.enable = true;
 
+  # Enable modern Nix commands and flake-based applications.
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  # Enable the detected Intel Bluetooth controller and BlueZ.
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+  };
+
   # Set your time zone.
   time.timeZone = "America/New_York";
 
@@ -101,6 +110,9 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    git
+    pciutils
+    usbutils
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
