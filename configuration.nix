@@ -10,6 +10,15 @@
   # Preserve the currently selected kernel family.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
+  # Compressed in-memory swap only. The Calamares installation intentionally
+  # has no disk swap and hibernation remains out of scope.
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50;
+    priority = 100;
+  };
+
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
