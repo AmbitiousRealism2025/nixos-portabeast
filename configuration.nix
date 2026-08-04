@@ -56,6 +56,12 @@
   hardware.nvidia = {
     package = config.boot.kernelPackages.nvidiaPackages.stable;
     open = false;
+    # Driver 595 enables GSP by default on Turing, but this T1200 reports RTD3
+    # as unsupported while GSP is active. Use the proprietary module's native
+    # management path so the reviewed fine-grained runtime power policy can be
+    # tested without changing the driver or offload configuration.
+    gsp.enable = false;
+    moduleParams.nvidia.NVreg_EnableGpuFirmware = 0;
     modesetting.enable = true;
     powerManagement = {
       enable = true;
