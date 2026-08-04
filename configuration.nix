@@ -52,10 +52,10 @@
   };
 
   systemd.sleep.settings.Sleep = {
-    # A direct s2idle return appeared clean, but NVIDIA 595.84 later faulted
-    # in rm_acpi_nvpcf_notify.  Keep every sleep entry point unavailable
-    # until a future driver/kernel combination passes repeated testing.
-    AllowSuspend = "no";
+    # Test manual s2idle with the open 610 driver stack recovered from the
+    # working CachyOS installation. Keep every automatic/combined sleep path
+    # contained until manual suspend has passed repeatedly.
+    AllowSuspend = "yes";
     AllowHibernation = "no";
     AllowHybridSleep = "no";
     AllowSuspendThenHibernate = "no";
@@ -89,21 +89,17 @@
   ];
 
   hardware.nvidia = {
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-    open = false;
-    # Driver 595 enables GSP by default on Turing, but this T1200 reports RTD3
-    # as unsupported while GSP is active. Use the proprietary module's native
-    # management path so the reviewed fine-grained runtime power policy can be
-    # tested without changing the driver or offload configuration.
-    gsp.enable = false;
-    moduleParams.nvidia.NVreg_EnableGpuFirmware = 0;
+    # Match the working CachyOS stack: NVIDIA 610 open kernel module, GSP,
+    # kernel suspend notifiers, full VRAM preservation, and no forced RTD3.
+    package = config.boot.kernelPackages.nvidiaPackages.latest;
+    open = true;
+    gsp.enable = true;
+    moduleParams.nvidia.NVreg_TemporaryFilePath = "/var/tmp";
     modesetting.enable = true;
     powerManagement = {
-      # Stage 1 removes NVIDIA's experimental systemd sleep helper, whose
-      # nvidia-sleep.sh process deadlocked before this machine entered s2idle.
-      # Fine-grained PRIME RTD3 stays independently enabled below.
-      enable = false;
-      finegrained = true;
+      enable = true;
+      kernelSuspendNotifier = true;
+      finegrained = false;
     };
     prime = {
       intelBusId = "PCI:0@0:2:0";
