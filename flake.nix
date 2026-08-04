@@ -38,6 +38,7 @@
       helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix { inherit codexCli; };
+      traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
     in
     {
       # eval-config reads the release's own .version-suffix and .git-revision.
@@ -45,7 +46,7 @@
       # metadata, which a release tarball intentionally does not carry.
       nixosConfigurations.nixos = import (nixpkgs + "/nixos/lib/eval-config.nix") {
         inherit system;
-        specialArgs = { inherit helium opencode t3code; };
+        specialArgs = { inherit helium opencode t3code traycer; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.home-manager
@@ -53,7 +54,7 @@
           {
             environment.systemPackages = [ codexCli ];
             home-manager.extraSpecialArgs = {
-              inherit voxtype helium opencode t3code;
+              inherit voxtype helium opencode t3code traycer;
             };
             programs.codexDesktopLinux = {
               enable = true;

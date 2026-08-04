@@ -9,6 +9,7 @@
     ./opencode.nix
     ./shell.nix
     ./t3code.nix
+    ./traycer.nix
     ./voxtype.nix
   ];
 

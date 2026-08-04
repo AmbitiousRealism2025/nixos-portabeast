@@ -5,6 +5,7 @@
   opencode,
   pkgs,
   t3code,
+  traycer,
   ...
 }:
 
@@ -198,6 +199,7 @@
       # T3 Code uses the existing declarative Codex CLI path inherited above;
       # this entry merely makes the sandboxed desktop wrapper launchable.
       t3code
+      traycer
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
