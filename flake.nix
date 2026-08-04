@@ -7,6 +7,11 @@
   inputs = {
     nixpkgs.url = "https://releases.nixos.org/nixos/26.05/nixos-26.05.6815.531670d871c0/nixexprs.tar.xz";
 
+    # The release pin above is frozen at NVIDIA 595.71.05. This narrow second
+    # source supplies the upstream 595.84 RTD3 fix together with its matching
+    # Linux 7.1.6 kernel, without advancing the desktop or application set.
+    nvidia-nixpkgs.url = "github:NixOS/nixpkgs/e72e4f299401a3689d4b3d5fc6496b11db7064eb";
+
     home-manager = {
       url = "github:nix-community/home-manager/d4fd24667c8cbef124bb70a20380cab75ec8474d";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -26,6 +31,7 @@
   outputs =
     {
       nixpkgs,
+      nvidia-nixpkgs,
       home-manager,
       codex-desktop-linux,
       codex-nixpkgs,
@@ -34,6 +40,10 @@
     }:
     let
       system = "x86_64-linux";
+      nvidiaPkgs = import nvidia-nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
       helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
@@ -46,7 +56,9 @@
       # metadata, which a release tarball intentionally does not carry.
       nixosConfigurations.nixos = import (nixpkgs + "/nixos/lib/eval-config.nix") {
         inherit system;
-        specialArgs = { inherit helium opencode t3code traycer; };
+        specialArgs = {
+          inherit helium nvidiaPkgs opencode t3code traycer;
+        };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.home-manager

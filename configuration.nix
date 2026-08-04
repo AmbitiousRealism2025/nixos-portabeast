@@ -2,6 +2,7 @@
   config,
   helium,
   lib,
+  nvidiaPkgs,
   opencode,
   pkgs,
   t3code,
@@ -20,8 +21,10 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Preserve the currently selected kernel family.
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # Keep the release-pinned userspace, but use the matching Linux 7.1.6 and
+  # NVIDIA 595.84 pair from the narrowly pinned driver source. NVIDIA 595.84
+  # specifically fixes RTD3 suspend/resume failures seen on this laptop.
+  boot.kernelPackages = nvidiaPkgs.linuxPackages_latest;
 
   # Compressed in-memory swap only. The Calamares installation intentionally
   # has no disk swap and hibernation remains out of scope.
