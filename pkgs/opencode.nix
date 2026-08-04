@@ -6,16 +6,28 @@
 }:
 
 let
+  pname = "opencode-desktop";
   desktopVersion = "1.18.12";
+  src = fetchurl {
+    url = "https://github.com/anomalyco/opencode/releases/download/v${desktopVersion}/opencode-desktop-linux-x86_64.AppImage";
+    hash = "sha256-HMK6YasBK1Wz0lqpwLk3imPxLnFY9kbXsDif9zvBp9w=";
+  };
+  appimageContents = appimageTools.extractType2 {
+    inherit pname src;
+    version = desktopVersion;
+  };
 
   desktop = appimageTools.wrapType2 {
-    pname = "opencode-desktop";
+    inherit pname src;
     version = desktopVersion;
 
-    src = fetchurl {
-      url = "https://github.com/anomalyco/opencode/releases/download/v${desktopVersion}/opencode-desktop-linux-x86_64.AppImage";
-      hash = "sha256-HMK6YasBK1Wz0lqpwLk3imPxLnFY9kbXsDif9zvBp9w=";
-    };
+    extraInstallCommands = ''
+      for size in 32 64 128; do
+        install -m 444 -D \
+          ${appimageContents}/usr/share/icons/hicolor/"$size"x"$size"/apps/ai.opencode.desktop.png \
+          "$out/share/icons/hicolor/''${size}x''${size}/apps/ai.opencode.desktop.png"
+      done
+    '';
 
     meta = {
       description = "OpenCode desktop application";

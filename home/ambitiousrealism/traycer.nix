@@ -60,7 +60,7 @@ in
     name = "Traycer";
     comment = "Spec-driven development desktop app";
     exec = "${traycer}/bin/traycer-desktop";
-    icon = "utilities-terminal";
+    icon = "traycer-desktop";
     terminal = false;
     categories = [ "Development" "IDE" ];
   };

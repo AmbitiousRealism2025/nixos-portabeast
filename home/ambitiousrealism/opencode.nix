@@ -12,7 +12,7 @@
     name = "OpenCode";
     comment = "OpenCode desktop coding agent";
     exec = "${opencode.desktop}/bin/opencode-desktop";
-    icon = "utilities-terminal";
+    icon = "ai.opencode.desktop";
     terminal = false;
     categories = [ "Development" "IDE" ];
   };
