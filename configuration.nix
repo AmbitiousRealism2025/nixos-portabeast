@@ -144,7 +144,16 @@
     # DMS launches several optional helpers by name. Give its service the same
     # declarative system path that contains dgop, matugen, NetworkManager,
     # wtype, and the normal session utilities installed by the module.
-    path = [ config.system.path ];
+    path = [
+      config.system.path
+      # DMS launches desktop entries by their Exec name. Cursor is owned by
+      # Home Manager, so expose the exact same pinned package to the DMS
+      # service without promoting it to the global system package list.
+      pkgs.code-cursor
+      # Let DMS terminal actions and its health check resolve the already
+      # proven Kitty package as well as Hyprland's absolute Kitty binding.
+      pkgs.kitty
+    ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
       Requisite = "wayland-session@hyprland.desktop.target";
