@@ -52,10 +52,10 @@
   };
 
   systemd.sleep.settings.Sleep = {
-    # Test manual suspend only after the NVIDIA 595.84 RTD3 baseline passed
-    # normal desktop use and a controlled reboot.  Keep every automatic path
-    # contained until the supervised s2idle test itself passes.
-    AllowSuspend = "yes";
+    # A direct s2idle return appeared clean, but NVIDIA 595.84 later faulted
+    # in rm_acpi_nvpcf_notify.  Keep every sleep entry point unavailable
+    # until a future driver/kernel combination passes repeated testing.
+    AllowSuspend = "no";
     AllowHibernation = "no";
     AllowHybridSleep = "no";
     AllowSuspendThenHibernate = "no";
