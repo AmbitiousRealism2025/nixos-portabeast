@@ -66,7 +66,10 @@ let
         translate = false;
         gpu_isolation = true;
         flash_attention = true;
-        context_window_optimization = false;
+        # The full 30-second context took 39 seconds for a 3.5-second phrase on
+        # the T1200. Upstream's conservative short-clip context reduced the
+        # same local Vulkan diagnostic from 7.9 seconds to 0.83 seconds.
+        context_window_optimization = true;
       };
     }
   );
