@@ -32,19 +32,26 @@
       voxtype,
       ...
     }:
+    let
+      system = "x86_64-linux";
+      opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
+    in
     {
       # eval-config reads the release's own .version-suffix and .git-revision.
       # nixpkgs.lib.nixosSystem instead derives these fields from flake source
       # metadata, which a release tarball intentionally does not carry.
       nixosConfigurations.nixos = import (nixpkgs + "/nixos/lib/eval-config.nix") {
-        system = "x86_64-linux";
+        inherit system;
+        specialArgs = { inherit opencode; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.home-manager
           codex-desktop-linux.nixosModules.default
           {
             environment.systemPackages = [ codex-nixpkgs.legacyPackages.x86_64-linux.codex ];
-            home-manager.extraSpecialArgs = { inherit voxtype; };
+            home-manager.extraSpecialArgs = {
+              inherit voxtype opencode;
+            };
             programs.codexDesktopLinux = {
               enable = true;
               cliPackage = codex-nixpkgs.legacyPackages.x86_64-linux.codex;
@@ -53,6 +60,6 @@
         ];
       };
 
-      formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixfmt;
+      formatter.x86_64-linux = nixpkgs.legacyPackages.${system}.nixfmt;
     };
 }

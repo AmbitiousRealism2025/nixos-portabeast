@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  opencode,
   pkgs,
   ...
 }:
@@ -186,6 +187,9 @@
       # Meld is the only graphical application in the utility batch; expose
       # it so DMS Spotlight can launch its desktop entry reliably.
       pkgs.meld
+      # The package is a pinned upstream AppImage; DMS needs its executable
+      # path explicitly because it does not inherit Home Manager's profile.
+      opencode.desktop
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";

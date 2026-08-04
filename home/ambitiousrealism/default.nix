@@ -5,6 +5,7 @@
     ./browser.nix
     ./desktop-tools.nix
     ./hyprland.nix
+    ./opencode.nix
     ./shell.nix
     ./voxtype.nix
   ];
