@@ -68,6 +68,10 @@ in
 
   programs.kitty = {
     enable = true;
+    keybindings = {
+      "alt+shift+c" = "copy_to_clipboard";
+      "alt+shift+v" = "paste_from_clipboard";
+    };
     settings = {
       confirm_os_window_close = 0;
 
@@ -180,6 +184,15 @@ in
         # Omarchy's region-capture workflow: save under XDG Pictures, copy the
         # PNG to the clipboard, and show the final path in a notification.
         (mkExecBind "PRINT" "${screenshotRegion}/bin/screenshot-region")
+
+        # Apple-shaped editing muscle memory. Hyprland translates these
+        # focused-window shortcuts natively, while physical Ctrl+C remains
+        # available for terminal interrupts. Kitty owns its shifted copy and
+        # paste variants above so they never collide with shell control keys.
+        (mkNativeBind "ALT + C" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "C" })'')
+        (mkNativeBind "ALT + V" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "V" })'')
+        (mkNativeBind "ALT + X" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "X" })'')
+        (mkNativeBind "ALT + Z" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "Z" })'')
 
         # Omarchy-compatible tiling and focus muscle memory.
         (mkNativeBind "SUPER + Q" "hl.dsp.window.close()")
