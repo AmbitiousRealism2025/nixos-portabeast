@@ -95,6 +95,10 @@ in
         (mkExecBind "SUPER + SPACE" "${pkgs.dms-shell}/bin/dms ipc call spotlight toggle")
         (mkExecBind "SUPER + SHIFT + SPACE" "uwsm app -- ${pkgs.fuzzel}/bin/fuzzel")
 
+        # Voxtype owns no global input device. Hyprland invokes its local daemon
+        # through the ordinary client command when bare Insert is pressed.
+        (mkExecBind "INSERT" "voxtype record toggle")
+
         # Omarchy-shaped shell controls, translated to DMS 1.4.6 IPC methods
         # verified from the package in the pinned NixOS release.
         (mkExecBind "SUPER + ALT + SPACE" "${pkgs.dms-shell}/bin/dms ipc call settings focusOrToggle")

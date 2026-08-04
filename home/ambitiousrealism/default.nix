@@ -4,6 +4,7 @@
   imports = [
     ./hyprland.nix
     ./shell.nix
+    ./voxtype.nix
   ];
 
   home = {

@@ -16,6 +16,11 @@
     # CLI version that was proven during bootstrap.
     codex-desktop-linux.url = "github:ilysenko/codex-desktop-linux";
     codex-nixpkgs.url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1046984.104240a77242/nixexprs.tar.xz";
+
+    # Pin the reviewed, signed Voxtype v0.7.5 release commit. Keep its own
+    # upstream-tested nixpkgs lock rather than changing the package underneath
+    # this exact source revision.
+    voxtype.url = "github:peteonrails/voxtype/8d49248baa53f29cb33007c9625a37281c72e799";
   };
 
   outputs =
@@ -24,6 +29,7 @@
       home-manager,
       codex-desktop-linux,
       codex-nixpkgs,
+      voxtype,
       ...
     }:
     {
@@ -38,6 +44,7 @@
           codex-desktop-linux.nixosModules.default
           {
             environment.systemPackages = [ codex-nixpkgs.legacyPackages.x86_64-linux.codex ];
+            home-manager.extraSpecialArgs = { inherit voxtype; };
             programs.codexDesktopLinux = {
               enable = true;
               cliPackage = codex-nixpkgs.legacyPackages.x86_64-linux.codex;
