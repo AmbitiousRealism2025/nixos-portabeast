@@ -9,6 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ./browser.nix
+    ./onepassword.nix
   ];
 
   # Preserve the working Calamares bootloader configuration.
