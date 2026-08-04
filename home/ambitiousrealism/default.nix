@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ./desktop-tools.nix
     ./hyprland.nix
     ./shell.nix
     ./voxtype.nix

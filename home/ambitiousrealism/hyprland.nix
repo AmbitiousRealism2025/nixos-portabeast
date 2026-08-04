@@ -17,6 +17,31 @@ let
     ];
   };
 
+  screenshotRegion = pkgs.writeShellApplication {
+    name = "screenshot-region";
+    runtimeInputs = with pkgs; [
+      coreutils
+      grim
+      slurp
+      wl-clipboard
+      libnotify
+      xdg-user-dirs
+    ];
+    text = ''
+      region="$(slurp)" || exit 0
+      [ -n "$region" ] || exit 0
+
+      pictures="$(xdg-user-dir PICTURES)"
+      output_dir="$pictures/Screenshots"
+      mkdir -p "$output_dir"
+      output="$output_dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+
+      grim -g "$region" "$output"
+      wl-copy < "$output"
+      notify-send "Screenshot saved" "$output"
+    '';
+  };
+
   workspaceBinds = lib.concatMap (
     number:
     let
@@ -37,6 +62,7 @@ in
   home.packages = with pkgs; [
     brightnessctl
     fuzzel
+    screenshotRegion
   ];
   home.sessionVariables.TERMINAL = "kitty";
 
@@ -107,6 +133,10 @@ in
         (mkExecBind "SUPER + CTRL + V" "${pkgs.dms-shell}/bin/dms ipc call clipboard toggle")
         (mkExecBind "SUPER + CTRL + SPACE" "${pkgs.dms-shell}/bin/dms ipc call dankdash wallpaper")
 
+        # Omarchy's region-capture workflow: save under XDG Pictures, copy the
+        # PNG to the clipboard, and show the final path in a notification.
+        (mkExecBind "PRINT" "${screenshotRegion}/bin/screenshot-region")
+
         # Omarchy-compatible tiling and focus muscle memory.
         (mkNativeBind "SUPER + W" "hl.dsp.window.close()")
         (mkNativeBind "SUPER + T" ''hl.dsp.window.float({ action = "toggle" })'')
@@ -128,8 +158,8 @@ in
         (mkNativeBind "SUPER + SHIFT + DOWN" ''hl.dsp.window.move({ direction = "down" })'')
         (mkNativeBind "SUPER + TAB" ''hl.dsp.focus({ workspace = "e+1" })'')
         (mkNativeBind "SUPER + SHIFT + TAB" ''hl.dsp.focus({ workspace = "e-1" })'')
-        (mkNativeBind "ALT + TAB" ''hl.dsp.window.cycle_next({ next = true })'')
-        (mkNativeBind "ALT + SHIFT + TAB" ''hl.dsp.window.cycle_next({ next = false })'')
+        (mkNativeBind "ALT + TAB" "hl.dsp.window.cycle_next({ next = true })")
+        (mkNativeBind "ALT + SHIFT + TAB" "hl.dsp.window.cycle_next({ next = false })")
         (mkNativeBind "SUPER + mouse_down" ''hl.dsp.focus({ workspace = "e+1" })'')
         (mkNativeBind "SUPER + mouse_up" ''hl.dsp.focus({ workspace = "e-1" })'')
 
