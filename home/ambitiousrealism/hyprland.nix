@@ -113,11 +113,11 @@ in
       };
 
       bind = [
-        # Applications: Kitty and Firefox retain their proven bindings. DMS
+        # Applications: Kitty and the selected Zen browser use direct bindings. DMS
         # Spotlight becomes the primary launcher, with Fuzzel one chord away
         # as a shell-independent recovery fallback.
         (mkExecBind "SUPER + RETURN" "uwsm app -- ${pkgs.kitty}/bin/kitty")
-        (mkExecBind "SUPER + SHIFT + RETURN" "uwsm app -- /run/current-system/sw/bin/firefox")
+        (mkExecBind "SUPER + SHIFT + RETURN" "uwsm app -- /run/current-system/sw/bin/zen")
         (mkExecBind "SUPER + SPACE" "${pkgs.dms-shell}/bin/dms ipc call spotlight toggle")
         (mkExecBind "SUPER + SHIFT + SPACE" "uwsm app -- ${pkgs.fuzzel}/bin/fuzzel")
 

@@ -2,6 +2,7 @@
 
 {
   imports = [
+    ./browser.nix
     ./desktop-tools.nix
     ./hyprland.nix
     ./shell.nix
