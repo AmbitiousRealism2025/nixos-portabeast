@@ -1,7 +1,9 @@
 {
   appimageTools,
+  autoPatchelfHook,
   fetchurl,
   lib,
+  stdenv,
   stdenvNoCC,
 }:
 
@@ -18,6 +20,9 @@ let
     };
 
     unpackPhase = "tar -xzf $src";
+
+    nativeBuildInputs = [ autoPatchelfHook ];
+    buildInputs = [ stdenv.cc.cc ];
 
     installPhase = ''
       install -D -m 755 opencode $out/bin/opencode
