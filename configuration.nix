@@ -37,8 +37,9 @@
 
   # Temporary safety containment for a measured NVIDIA suspend deadlock. The
   # laptop remained awake after a lid-close suspend attempt, drained its main
-  # battery, and subsequently lost its RTC/firmware settings. Until the
-  # NVIDIA sleep path is validated in a separate boot-only test, lid close
+  # battery, and subsequently lost its RTC/firmware settings. A supervised
+  # manual-suspend test also reproduced an NVIDIA graphics/ACPI deadlock
+  # during logout. Until a different repair route is verified, lid close
   # powers the undocked laptop off cleanly and every system sleep mode is
   # unavailable. A docked/external-display setup simply ignores lid close.
   services.logind.settings.Login = {
@@ -48,14 +49,12 @@
   };
 
   systemd.sleep.settings.Sleep = {
-    # Stage 2: only supervised, manually initiated s2idle suspend is enabled.
-    # Disk-backed hibernation and any automatic lid-close sleep remain outside
-    # this test generation.
-    AllowSuspend = "yes";
+    # Suspend testing failed at the NVIDIA graphics/ACPI boundary. Restore
+    # full containment without changing the accepted offload/RTD3 policy.
+    AllowSuspend = "no";
     AllowHibernation = "no";
     AllowHybridSleep = "no";
     AllowSuspendThenHibernate = "no";
-    MemorySleepMode = "s2idle";
   };
 
   nix.settings.experimental-features = [
