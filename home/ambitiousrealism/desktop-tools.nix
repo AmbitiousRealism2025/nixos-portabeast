@@ -7,6 +7,22 @@
     code-cursor
     thunderbird
     discord
+
+    # General terminal, inspection, transfer, and development tools selected
+    # together as the first low-risk utility batch.
+    btop
+    duf
+    fastfetch
+    ripgrep
+    rsync
+    less
+    unrar
+    python3
+    nodejs
+    cmake
+
+    # Graphical diff/merge tool. DMS receives its executable separately below.
+    meld
     inter
     fira-code
     nerd-fonts.jetbrains-mono

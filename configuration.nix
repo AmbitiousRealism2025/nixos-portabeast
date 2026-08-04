@@ -183,6 +183,9 @@
       # Discord follows the same Home Manager + DMS launcher boundary as
       # Thunderbird. Keep its executable explicit for Spotlight launches.
       pkgs.discord
+      # Meld is the only graphical application in the utility batch; expose
+      # it so DMS Spotlight can launch its desktop entry reliably.
+      pkgs.meld
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
