@@ -1,5 +1,6 @@
 {
   config,
+  helium,
   lib,
   opencode,
   pkgs,
@@ -190,6 +191,9 @@
       # The package is a pinned upstream AppImage; DMS needs its executable
       # path explicitly because it does not inherit Home Manager's profile.
       opencode.desktop
+      # Helium is an alternative browser only. Its explicit DMS path makes the
+      # reviewed launcher work without changing Zen's MIME ownership.
+      helium
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";

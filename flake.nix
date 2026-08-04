@@ -34,6 +34,7 @@
     }:
     let
       system = "x86_64-linux";
+      helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
     in
     {
@@ -42,7 +43,7 @@
       # metadata, which a release tarball intentionally does not carry.
       nixosConfigurations.nixos = import (nixpkgs + "/nixos/lib/eval-config.nix") {
         inherit system;
-        specialArgs = { inherit opencode; };
+        specialArgs = { inherit helium opencode; };
         modules = [
           ./configuration.nix
           home-manager.nixosModules.home-manager
@@ -50,7 +51,7 @@
           {
             environment.systemPackages = [ codex-nixpkgs.legacyPackages.x86_64-linux.codex ];
             home-manager.extraSpecialArgs = {
-              inherit voxtype opencode;
+              inherit voxtype helium opencode;
             };
             programs.codexDesktopLinux = {
               enable = true;

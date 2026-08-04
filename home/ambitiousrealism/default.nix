@@ -4,6 +4,7 @@
   imports = [
     ./browser.nix
     ./desktop-tools.nix
+    ./helium.nix
     ./hyprland.nix
     ./opencode.nix
     ./shell.nix
