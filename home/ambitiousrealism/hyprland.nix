@@ -182,24 +182,23 @@ in
         (mkExecBind "PRINT" "${screenshotRegion}/bin/screenshot-region")
 
         # Omarchy-compatible tiling and focus muscle memory.
-        (mkNativeBind "SUPER + W" "hl.dsp.window.close()")
+        (mkNativeBind "SUPER + Q" "hl.dsp.window.close()")
         (mkNativeBind "SUPER + T" ''hl.dsp.window.float({ action = "toggle" })'')
-        (mkNativeBind "SUPER + J" ''hl.dsp.layout("togglesplit")'')
         (mkNativeBind "SUPER + P" "hl.dsp.window.pseudo()")
-        (mkNativeBind "SUPER + F" ''
+        (mkNativeBind "SUPER + W" ''
           hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })
         '')
-        (mkNativeBind "SUPER + ALT + F" ''
+        (mkNativeBind "SUPER + F" ''
           hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })
         '')
-        (mkNativeBind "SUPER + LEFT" ''hl.dsp.focus({ direction = "left" })'')
-        (mkNativeBind "SUPER + RIGHT" ''hl.dsp.focus({ direction = "right" })'')
-        (mkNativeBind "SUPER + UP" ''hl.dsp.focus({ direction = "up" })'')
-        (mkNativeBind "SUPER + DOWN" ''hl.dsp.focus({ direction = "down" })'')
-        (mkNativeBind "SUPER + SHIFT + LEFT" ''hl.dsp.window.move({ direction = "left" })'')
-        (mkNativeBind "SUPER + SHIFT + RIGHT" ''hl.dsp.window.move({ direction = "right" })'')
-        (mkNativeBind "SUPER + SHIFT + UP" ''hl.dsp.window.move({ direction = "up" })'')
-        (mkNativeBind "SUPER + SHIFT + DOWN" ''hl.dsp.window.move({ direction = "down" })'')
+        (mkNativeBind "SUPER + H" ''hl.dsp.focus({ direction = "left" })'')
+        (mkNativeBind "SUPER + J" ''hl.dsp.focus({ direction = "up" })'')
+        (mkNativeBind "SUPER + K" ''hl.dsp.focus({ direction = "down" })'')
+        (mkNativeBind "SUPER + L" ''hl.dsp.focus({ direction = "right" })'')
+        (mkNativeBind "SUPER + SHIFT + H" ''hl.dsp.window.move({ direction = "left" })'')
+        (mkNativeBind "SUPER + SHIFT + J" ''hl.dsp.window.move({ direction = "up" })'')
+        (mkNativeBind "SUPER + SHIFT + K" ''hl.dsp.window.move({ direction = "down" })'')
+        (mkNativeBind "SUPER + SHIFT + L" ''hl.dsp.window.move({ direction = "right" })'')
         (mkNativeBind "SUPER + TAB" ''hl.dsp.focus({ workspace = "e+1" })'')
         (mkNativeBind "SUPER + SHIFT + TAB" ''hl.dsp.focus({ workspace = "e-1" })'')
         (mkNativeBind "ALT + TAB" "hl.dsp.window.cycle_next({ next = true })")
