@@ -5,6 +5,7 @@
   # by NixOS as a Plasma-safe fallback.
   home.packages = with pkgs; [
     code-cursor
+    thunderbird
     inter
     fira-code
     nerd-fonts.jetbrains-mono
