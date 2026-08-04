@@ -38,23 +38,19 @@
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
-  # Temporary safety containment for a measured NVIDIA suspend deadlock. The
-  # laptop remained awake after a lid-close suspend attempt, drained its main
-  # battery, and subsequently lost its RTC/firmware settings. A supervised
-  # manual-suspend test also reproduced an NVIDIA graphics/ACPI deadlock
-  # during logout. Until a different repair route is verified, lid close
-  # powers the undocked laptop off cleanly and every system sleep mode is
-  # unavailable. A docked/external-display setup simply ignores lid close.
+  # The CachyOS-matched NVIDIA 610 open stack has passed manual s2idle and
+  # post-resume application tests. Extend that verified path to lid close on
+  # battery and external power. A docked/external-display setup still ignores
+  # lid close, and the untested hibernation paths remain disabled below.
   services.logind.settings.Login = {
-    HandleLidSwitch = "poweroff";
-    HandleLidSwitchExternalPower = "poweroff";
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "suspend";
     HandleLidSwitchDocked = "ignore";
   };
 
   systemd.sleep.settings.Sleep = {
-    # Test manual s2idle with the open 610 driver stack recovered from the
-    # working CachyOS installation. Keep every automatic/combined sleep path
-    # contained until manual suspend has passed repeatedly.
+    # Use s2idle with the open 610 driver stack recovered from the working
+    # CachyOS installation. Keep every hibernation/combined path disabled.
     AllowSuspend = "yes";
     AllowHibernation = "no";
     AllowHybridSleep = "no";
