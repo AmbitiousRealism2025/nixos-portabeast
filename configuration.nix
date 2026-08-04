@@ -176,6 +176,10 @@
       # Let DMS terminal actions and its health check resolve the already
       # proven Kitty package as well as Hyprland's absolute Kitty binding.
       pkgs.kitty
+      # Thunderbird is a Home Manager package. Its desktop entry is indexed
+      # by DMS, so expose the same executable to DMS's restricted service
+      # path rather than relying on the user's interactive profile.
+      pkgs.thunderbird
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
