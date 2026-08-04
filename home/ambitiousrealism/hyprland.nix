@@ -70,6 +70,39 @@ in
     enable = true;
     settings = {
       confirm_os_window_close = 0;
+
+      # Graphene terminal palette: quiet near-black surfaces with the
+      # wallpaper's cyan, electric-blue, indigo, and charcoal-violet accents.
+      background = "#000000";
+      foreground = "#dffcff";
+      selection_background = "#333399";
+      selection_foreground = "#ffffff";
+      cursor = "#66cccc";
+      cursor_text_color = "#000000";
+      url_color = "#66cccc";
+      active_border_color = "#66cccc";
+      inactive_border_color = "#424153";
+      active_tab_background = "#0066cc";
+      active_tab_foreground = "#ffffff";
+      inactive_tab_background = "#11142a";
+      inactive_tab_foreground = "#a9cbd2";
+
+      color0 = "#000000";
+      color1 = "#ef708f";
+      color2 = "#66cccc";
+      color3 = "#e6b96c";
+      color4 = "#0066cc";
+      color5 = "#8b8be6";
+      color6 = "#66cccc";
+      color7 = "#dffcff";
+      color8 = "#424153";
+      color9 = "#ff8eaa";
+      color10 = "#8ee6e6";
+      color11 = "#f4cf8d";
+      color12 = "#4b91ff";
+      color13 = "#adadff";
+      color14 = "#9af2f2";
+      color15 = "#ffffff";
     };
   };
 
@@ -86,10 +119,14 @@ in
     settings = {
       config = {
         general = {
-          gaps_in = 12;
-          gaps_out = 12;
-          border_size = 4;
+          gaps_in = 4;
+          gaps_out = 4;
+          border_size = 2;
           layout = "dwindle";
+          "col.active_border" = "rgba(66ccccff)";
+          "col.inactive_border" = "rgba(424153cc)";
+          "col.nogroup_border_active" = "rgba(0066ccff)";
+          "col.nogroup_border" = "rgba(333399aa)";
         };
         decoration = {
           rounding = 10;
@@ -99,6 +136,13 @@ in
             enabled = true;
             size = 4;
             passes = 2;
+          };
+          shadow = {
+            enabled = true;
+            range = 8;
+            render_power = 2;
+            color = "rgba(0066cc44)";
+            color_inactive = "rgba(00000055)";
           };
         };
         animations.enabled = true;
