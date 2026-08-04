@@ -15,4 +15,16 @@
       "x-scheme-handler/codex" = [ "codex-desktop.desktop" ];
     };
   };
+
+  # A lightweight DMS-visible web launcher. It intentionally uses the existing
+  # declarative Zen browser and does not create a separate profile or copy any
+  # browser state from another system.
+  xdg.desktopEntries.wallhaven = {
+    name = "Wallhaven";
+    comment = "Browse wallpapers on Wallhaven";
+    exec = "zen --new-window https://wallhaven.cc/";
+    icon = "web-browser";
+    terminal = false;
+    categories = [ "Network" "WebBrowser" ];
+  };
 }
