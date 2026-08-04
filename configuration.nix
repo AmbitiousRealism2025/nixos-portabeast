@@ -180,6 +180,9 @@
       # by DMS, so expose the same executable to DMS's restricted service
       # path rather than relying on the user's interactive profile.
       pkgs.thunderbird
+      # Discord follows the same Home Manager + DMS launcher boundary as
+      # Thunderbird. Keep its executable explicit for Spotlight launches.
+      pkgs.discord
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";

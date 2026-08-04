@@ -6,6 +6,7 @@
   home.packages = with pkgs; [
     code-cursor
     thunderbird
+    discord
     inter
     fira-code
     nerd-fonts.jetbrains-mono
