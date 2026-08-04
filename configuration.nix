@@ -6,7 +6,10 @@
 }:
 
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [
+    ./hardware-configuration.nix
+    ./applications.nix
+  ];
 
   # Preserve the working Calamares bootloader configuration.
   boot.loader.systemd-boot.enable = true;
