@@ -31,6 +31,25 @@
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
+  # Temporary safety containment for a measured NVIDIA suspend deadlock. The
+  # laptop remained awake after a lid-close suspend attempt, drained its main
+  # battery, and subsequently lost its RTC/firmware settings. Until the
+  # NVIDIA sleep path is validated in a separate boot-only test, lid close
+  # powers the undocked laptop off cleanly and every system sleep mode is
+  # unavailable. A docked/external-display setup simply ignores lid close.
+  services.logind.settings.Login = {
+    HandleLidSwitch = "poweroff";
+    HandleLidSwitchExternalPower = "poweroff";
+    HandleLidSwitchDocked = "ignore";
+  };
+
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowHybridSleep = "no";
+    AllowSuspendThenHibernate = "no";
+  };
+
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
