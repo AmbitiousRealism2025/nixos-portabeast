@@ -48,10 +48,14 @@
   };
 
   systemd.sleep.settings.Sleep = {
-    AllowSuspend = "no";
+    # Stage 2: only supervised, manually initiated s2idle suspend is enabled.
+    # Disk-backed hibernation and any automatic lid-close sleep remain outside
+    # this test generation.
+    AllowSuspend = "yes";
     AllowHibernation = "no";
     AllowHybridSleep = "no";
     AllowSuspendThenHibernate = "no";
+    MemorySleepMode = "s2idle";
   };
 
   nix.settings.experimental-features = [
