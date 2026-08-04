@@ -1,49 +1,19 @@
 {
   appimageTools,
-  autoPatchelfHook,
   fetchurl,
   lib,
-  stdenv,
-  stdenvNoCC,
+  opencode,
 }:
 
 let
-  version = "1.18.12";
-
-  cli = stdenvNoCC.mkDerivation {
-    pname = "opencode";
-    inherit version;
-
-    src = fetchurl {
-      url = "https://github.com/anomalyco/opencode/releases/download/v${version}/opencode-linux-x64.tar.gz";
-      hash = "sha256-ei47cGMGsE+/U1O2fZFrCAH82lZfnuAhvqKncgeWFFI=";
-    };
-
-    unpackPhase = "tar -xzf $src";
-
-    nativeBuildInputs = [ autoPatchelfHook ];
-    buildInputs = [ stdenv.cc.cc ];
-
-    installPhase = ''
-      install -D -m 755 opencode $out/bin/opencode
-    '';
-
-    meta = {
-      description = "OpenCode terminal coding agent";
-      homepage = "https://opencode.ai/";
-      license = lib.licenses.mit;
-      platforms = [ "x86_64-linux" ];
-      mainProgram = "opencode";
-      sourceProvenance = [ lib.sourceTypes.binaryNativeCode ];
-    };
-  };
+  desktopVersion = "1.18.12";
 
   desktop = appimageTools.wrapType2 {
     pname = "opencode-desktop";
-    inherit version;
+    version = desktopVersion;
 
     src = fetchurl {
-      url = "https://github.com/anomalyco/opencode/releases/download/v${version}/opencode-desktop-linux-x86_64.AppImage";
+      url = "https://github.com/anomalyco/opencode/releases/download/v${desktopVersion}/opencode-desktop-linux-x86_64.AppImage";
       hash = "sha256-HMK6YasBK1Wz0lqpwLk3imPxLnFY9kbXsDif9zvBp9w=";
     };
 
@@ -58,5 +28,9 @@ let
   };
 in
 {
-  inherit cli desktop;
+  # Nixpkgs builds this terminal agent from the OpenCode source tree. Do not
+  # replace it with the current upstream Linux tarball: that archive was
+  # verified to contain Bun rather than the OpenCode command.
+  cli = opencode;
+  inherit desktop;
 }
