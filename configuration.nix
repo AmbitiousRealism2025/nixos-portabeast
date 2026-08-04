@@ -91,7 +91,10 @@
     moduleParams.nvidia.NVreg_EnableGpuFirmware = 0;
     modesetting.enable = true;
     powerManagement = {
-      enable = true;
+      # Stage 1 removes NVIDIA's experimental systemd sleep helper, whose
+      # nvidia-sleep.sh process deadlocked before this machine entered s2idle.
+      # Fine-grained PRIME RTD3 stays independently enabled below.
+      enable = false;
       finegrained = true;
     };
     prime = {
