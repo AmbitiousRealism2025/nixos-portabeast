@@ -45,7 +45,6 @@ let
       ) files
     );
 
-  robustModel = fetchWhisperModel "large-v3-turbo";
   baseModel = fetchWhisperModel "base.en";
   smallModel = fetchWhisperModel "small.en";
 
@@ -97,7 +96,6 @@ let
     ];
   };
 
-  robustPackage = voxtype.packages.${pkgs.system}.vulkan;
   cpuWhisperPackage = voxtype.packages.${pkgs.system}.default;
   cpuOnnxPackage = voxtype.packages.${pkgs.system}.onnx;
   toml = pkgs.formats.toml { };
@@ -155,23 +153,6 @@ let
     };
   };
 
-  robustConfig = toml.generate "voxtype-robust.toml" (
-    lib.recursiveUpdate commonSettings {
-      whisper = {
-        model = toString robustModel;
-        language = "en";
-        translate = false;
-        initial_prompt = technicalVocabulary;
-        gpu_isolation = true;
-        flash_attention = true;
-        # The full 30-second context took 39 seconds for a 3.5-second phrase on
-        # the T1200. Upstream's conservative short-clip context reduced the
-        # same local Vulkan diagnostic from 7.9 seconds to 0.83 seconds.
-        context_window_optimization = true;
-      };
-    }
-  );
-
   baseConfig = toml.generate "voxtype-base.toml" (
     lib.recursiveUpdate commonSettings {
       whisper = {
@@ -215,7 +196,6 @@ let
   parakeetV3Config = mkParakeetConfig "parakeet-v3-int8" parakeetV3Int8Model;
 
   voxtypeUnits = [
-    "voxtype.service"
     "voxtype-light.service"
     "voxtype-small.service"
     "voxtype-parakeet-v2.service"
@@ -245,17 +225,12 @@ let
     ];
     text = ''
       units=(
-        voxtype.service
         voxtype-light.service
         voxtype-small.service
         voxtype-parakeet-v2.service
         voxtype-parakeet-v3.service
       )
       case "''${1:-status}" in
-        robust)
-          target=voxtype.service
-          label='robust (NVIDIA Vulkan, large-v3-turbo)'
-          ;;
         light)
           target=voxtype-light.service
           label='light (CPU, base.en)'
@@ -279,7 +254,7 @@ let
           exit 0
           ;;
         *)
-          printf 'usage: voxtype-profile {robust|light|small|parakeet-v2|parakeet-v3|status}\n' >&2
+          printf 'usage: voxtype-profile {light|small|parakeet-v2|parakeet-v3|status}\n' >&2
           exit 64
           ;;
       esac
@@ -293,15 +268,14 @@ let
   };
 in
 {
-  # Only the robust package owns the unqualified `voxtype` command. The CPU
-  # services use immutable store paths, preventing command collisions.
+  # The unqualified `voxtype` client is the CPU ONNX build used by the default
+  # Parakeet service. All daemons still use immutable store paths.
   home.packages = [
-    robustPackage
+    cpuOnnxPackage
     profileCommand
   ];
 
   xdg.configFile = {
-    "voxtype/profiles/robust.toml".source = robustConfig;
     "voxtype/profiles/base.toml".source = baseConfig;
     "voxtype/profiles/small.toml".source = smallConfig;
     "voxtype/profiles/parakeet-v2-int8.toml".source = parakeetV2Config;
@@ -309,22 +283,6 @@ in
   };
 
   systemd.user.services = {
-    voxtype = {
-      Unit = baseUnit // {
-        Description = "Voxtype robust NVIDIA Vulkan profile";
-        Conflicts = lib.remove "voxtype.service" voxtypeUnits;
-      };
-      Service = (cpuService robustPackage robustConfig) // {
-        Environment = [
-          "VOXTYPE_VULKAN_DEVICE=nvidia"
-          "__NV_PRIME_RENDER_OFFLOAD=1"
-          "__VK_LAYER_NV_optimus=NVIDIA_only"
-          "__GLX_VENDOR_LIBRARY_NAME=nvidia"
-        ];
-      };
-      Install.WantedBy = [ "graphical-session.target" ];
-    };
-
     voxtype-light = {
       Unit = baseUnit // {
         Description = "Voxtype light CPU Whisper profile";
@@ -347,6 +305,9 @@ in
         Conflicts = lib.remove "voxtype-parakeet-v2.service" voxtypeUnits;
       };
       Service = cpuService cpuOnnxPackage parakeetV2Config;
+      # English Parakeet v2 was accepted interactively: 12.3 seconds of
+      # speech completed in 0.33 seconds on CPU with accurate text.
+      Install.WantedBy = [ "graphical-session.target" ];
     };
 
     voxtype-parakeet-v3 = {
