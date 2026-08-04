@@ -4,6 +4,7 @@
   lib,
   opencode,
   pkgs,
+  t3code,
   ...
 }:
 
@@ -194,6 +195,9 @@
       # Helium is an alternative browser only. Its explicit DMS path makes the
       # reviewed launcher work without changing Zen's MIME ownership.
       helium
+      # T3 Code uses the existing declarative Codex CLI path inherited above;
+      # this entry merely makes the sandboxed desktop wrapper launchable.
+      t3code
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";

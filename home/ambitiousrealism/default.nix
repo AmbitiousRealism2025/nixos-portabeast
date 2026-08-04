@@ -8,6 +8,7 @@
     ./hyprland.nix
     ./opencode.nix
     ./shell.nix
+    ./t3code.nix
     ./voxtype.nix
   ];
 
