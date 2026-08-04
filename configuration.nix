@@ -20,20 +20,33 @@
   # Preserve the working Calamares bootloader configuration.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  # systemd 260 records the selected swapfile device and physical offset in
+  # the UEFI HibernateLocation variable. Its initrd generator consumes that
+  # variable on the next boot and resumes before mounting the real root.
+  boot.initrd.systemd.enable = true;
 
   # Keep the release-pinned userspace, but use the matching Linux 7.1.6 and
   # NVIDIA 595.84 pair from the narrowly pinned driver source. NVIDIA 595.84
   # specifically fixes RTD3 suspend/resume failures seen on this laptop.
   boot.kernelPackages = nvidiaPkgs.linuxPackages_latest;
 
-  # Compressed in-memory swap only. The Calamares installation intentionally
-  # has no disk swap and hibernation remains out of scope.
+  # Keep fast compressed RAM swap for normal pressure. The lower-priority
+  # ext4 swapfile is large enough for 32 GiB RAM and exists primarily as the
+  # durable hibernation target; systemd deliberately ignores zram when
+  # selecting a hibernation device.
   zramSwap = {
     enable = true;
     algorithm = "zstd";
     memoryPercent = 50;
     priority = 100;
   };
+  swapDevices = [
+    {
+      device = "/swapfile";
+      size = 40960;
+      priority = 10;
+    }
+  ];
 
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
@@ -49,10 +62,11 @@
   };
 
   systemd.sleep.settings.Sleep = {
-    # Use s2idle with the open 610 driver stack recovered from the working
-    # CachyOS installation. Keep every hibernation/combined path disabled.
+    # Use s2idle and manual hibernation with the open 610 driver stack. Keep
+    # hybrid sleep and suspend-then-hibernate disabled until manual hibernate
+    # has independently passed.
     AllowSuspend = "yes";
-    AllowHibernation = "no";
+    AllowHibernation = "yes";
     AllowHybridSleep = "no";
     AllowSuspendThenHibernate = "no";
     MemorySleepMode = "s2idle";
