@@ -259,6 +259,10 @@
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
+  # This stationary, unencrypted home system prioritizes convenient local
+  # authentication. This affects only future password changes through passwd;
+  # password hashing remains yescrypt.
+  security.pam.services.passwd.rules.password.unix.settings.minlen = 4;
   services.pipewire = {
     enable = true;
     alsa.enable = true;
