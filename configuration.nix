@@ -52,12 +52,14 @@
   };
 
   systemd.sleep.settings.Sleep = {
-    # Suspend testing failed at the NVIDIA graphics/ACPI boundary. Restore
-    # full containment without changing the accepted offload/RTD3 policy.
-    AllowSuspend = "no";
+    # Test manual suspend only after the NVIDIA 595.84 RTD3 baseline passed
+    # normal desktop use and a controlled reboot.  Keep every automatic path
+    # contained until the supervised s2idle test itself passes.
+    AllowSuspend = "yes";
     AllowHibernation = "no";
     AllowHybridSleep = "no";
     AllowSuspendThenHibernate = "no";
+    MemorySleepMode = "s2idle";
   };
 
   nix.settings.experimental-features = [
