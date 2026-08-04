@@ -10,19 +10,6 @@ let
     ];
   };
 
-  mkHyprctlBind =
-    key: dispatcher: argument:
-    mkExecBind key (
-      lib.concatStringsSep " " (
-        [
-          "hyprctl"
-          "dispatch"
-          dispatcher
-        ]
-        ++ lib.optional (argument != "") argument
-      )
-    );
-
   mkNativeBind = key: action: {
     _args = [
       key
@@ -121,8 +108,12 @@ in
         (mkNativeBind "SUPER + T" ''hl.dsp.window.float({ action = "toggle" })'')
         (mkNativeBind "SUPER + J" ''hl.dsp.layout("togglesplit")'')
         (mkNativeBind "SUPER + P" "hl.dsp.window.pseudo()")
-        (mkHyprctlBind "SUPER + F" "fullscreen" "0")
-        (mkHyprctlBind "SUPER + ALT + F" "fullscreen" "1")
+        (mkNativeBind "SUPER + F" ''
+          hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })
+        '')
+        (mkNativeBind "SUPER + ALT + F" ''
+          hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })
+        '')
         (mkNativeBind "SUPER + LEFT" ''hl.dsp.focus({ direction = "left" })'')
         (mkNativeBind "SUPER + RIGHT" ''hl.dsp.focus({ direction = "right" })'')
         (mkNativeBind "SUPER + UP" ''hl.dsp.focus({ direction = "up" })'')
@@ -133,8 +124,8 @@ in
         (mkNativeBind "SUPER + SHIFT + DOWN" ''hl.dsp.window.move({ direction = "down" })'')
         (mkNativeBind "SUPER + TAB" ''hl.dsp.focus({ workspace = "e+1" })'')
         (mkNativeBind "SUPER + SHIFT + TAB" ''hl.dsp.focus({ workspace = "e-1" })'')
-        (mkHyprctlBind "ALT + TAB" "cyclenext" "")
-        (mkHyprctlBind "ALT + SHIFT + TAB" "cyclenext" "prev")
+        (mkNativeBind "ALT + TAB" ''hl.dsp.window.cycle_next({ next = true })'')
+        (mkNativeBind "ALT + SHIFT + TAB" ''hl.dsp.window.cycle_next({ next = false })'')
         (mkNativeBind "SUPER + mouse_down" ''hl.dsp.focus({ workspace = "e+1" })'')
         (mkNativeBind "SUPER + mouse_up" ''hl.dsp.focus({ workspace = "e-1" })'')
 
