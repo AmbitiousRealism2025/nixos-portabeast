@@ -34,9 +34,10 @@
     }:
     let
       system = "x86_64-linux";
+      codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
       helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
-      t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix { };
+      t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix { inherit codexCli; };
     in
     {
       # eval-config reads the release's own .version-suffix and .git-revision.
@@ -50,13 +51,13 @@
           home-manager.nixosModules.home-manager
           codex-desktop-linux.nixosModules.default
           {
-            environment.systemPackages = [ codex-nixpkgs.legacyPackages.x86_64-linux.codex ];
+            environment.systemPackages = [ codexCli ];
             home-manager.extraSpecialArgs = {
               inherit voxtype helium opencode t3code;
             };
             programs.codexDesktopLinux = {
               enable = true;
-              cliPackage = codex-nixpkgs.legacyPackages.x86_64-linux.codex;
+              cliPackage = codexCli;
             };
           }
         ];
