@@ -37,6 +37,43 @@
     powerOnBoot = true;
   };
 
+  # Keep the Intel GPU as the normal desktop renderer and expose the NVIDIA
+  # T1200 through PRIME render offload for Vulkan/GL applications such as
+  # Voxtype. The closed kernel module is intentional on this Turing laptop:
+  # unlike the open module, it supports the runtime D3 power-management path
+  # needed to let this generation of mobile GPU power down between offloads.
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = false;
+    extraPackages = [ pkgs.intel-media-driver ];
+  };
+
+  services.xserver.videoDrivers = [
+    "modesetting"
+    "nvidia"
+  ];
+
+  hardware.nvidia = {
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    open = false;
+    modesetting.enable = true;
+    powerManagement = {
+      enable = true;
+      finegrained = true;
+    };
+    prime = {
+      intelBusId = "PCI:0@0:2:0";
+      nvidiaBusId = "PCI:1@0:0:0";
+      sync.enable = false;
+      reverseSync.enable = false;
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;
+        offloadCmdMainProgram = "nvidia-offload";
+      };
+    };
+  };
+
   time.timeZone = "America/New_York";
   i18n.defaultLocale = "en_US.UTF-8";
   i18n.extraLocaleSettings = {
@@ -181,8 +218,10 @@
 
   environment.systemPackages = with pkgs; [
     git
+    mesa-demos
     pciutils
     usbutils
+    vulkan-tools
   ];
 
   system.stateVersion = "26.05";
