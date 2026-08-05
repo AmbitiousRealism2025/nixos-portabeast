@@ -1,5 +1,5 @@
 {
-  claudeCode,
+  albion,
   pkgs,
   ...
 }:
@@ -12,10 +12,12 @@
   home.packages = [
     pkgs.jdk25
     pkgs.zed-editor
-    claudeCode
+    albion
   ];
 
-  # Claude Code is installed once. Claudex and Albion will later receive
-  # separate CLAUDE_CONFIG_DIR values so credentials, settings, history, and
-  # plugins cannot collide; no provider configuration belongs in this layer.
+  # Claude Code is installed once inside the Albion package. The `claude` and
+  # `albion` commands both launch Albion with ~/.claude-albion and load
+  # ~/.albion/secrets.sh only for that invocation. `claude-stock` preserves an
+  # explicit Anthropic fallback using ~/.claude; Claudex will later receive a
+  # third configuration directory.
 }

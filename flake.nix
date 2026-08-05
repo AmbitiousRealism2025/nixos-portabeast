@@ -50,6 +50,7 @@
       };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
+      albion = unfreePkgs.callPackage ./pkgs/albion.nix { inherit claudeCode; };
       helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
       nemoPreview = nixpkgs.legacyPackages.${system}.nemo-preview.overrideAttrs (old: {
         patches = (old.patches or [ ]) ++ [ ./home/ambitiousrealism/nemo-preview-wayland.patch ];
@@ -59,7 +60,10 @@
       traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
     in
     {
-      packages.${system}.claude-code = claudeCode;
+      packages.${system} = {
+        inherit albion;
+        claude-code = claudeCode;
+      };
 
       # eval-config reads the release's own .version-suffix and .git-revision.
       # nixpkgs.lib.nixosSystem instead derives these fields from flake source
@@ -69,6 +73,7 @@
         specialArgs = {
           inherit
             claudeCode
+            albion
             helium
             nemoPreview
             nvidiaPkgs
@@ -86,6 +91,7 @@
             home-manager.extraSpecialArgs = {
               inherit
                 claudeCode
+                albion
                 voxtype
                 helium
                 nemoPreview
