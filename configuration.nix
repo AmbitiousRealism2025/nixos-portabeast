@@ -13,6 +13,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./azeron.nix
     ./browser.nix
     ./flatpak.nix
     ./nemo-preview-integration.nix

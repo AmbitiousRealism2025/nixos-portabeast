@@ -51,6 +51,7 @@
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
       albion = unfreePkgs.callPackage ./pkgs/albion.nix { inherit claudeCode; };
+      azeronSoftware = unfreePkgs.callPackage ./pkgs/azeron-software.nix { };
       cliproxyapi = unfreePkgs.callPackage ./pkgs/cliproxyapi.nix { };
       claudex = unfreePkgs.callPackage ./pkgs/claudex.nix {
         inherit
@@ -72,6 +73,7 @@
       packages.${system} = {
         inherit
           albion
+          azeronSoftware
           claudex
           cliproxyapi
           swiftpointX1
@@ -88,6 +90,7 @@
           inherit
             claudeCode
             albion
+            azeronSoftware
             claudex
             helium
             nemoPreview
