@@ -38,6 +38,12 @@
     ];
   };
 
+  fileSystems."/mnt/storage" = {
+    device = "/dev/disk/by-label/kingston-1tb";
+    fsType = "ext4";
+    options = [ "nofail" ];
+  };
+
   swapDevices = [ ];
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";

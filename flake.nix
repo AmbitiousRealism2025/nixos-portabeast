@@ -46,6 +46,9 @@
       };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
       helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
+      nemoPreview = nixpkgs.legacyPackages.${system}.nemo-preview.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./home/ambitiousrealism/nemo-preview-wayland.patch ];
+      });
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix { inherit codexCli; };
       traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
@@ -57,7 +60,7 @@
       nixosConfigurations.nixos = import (nixpkgs + "/nixos/lib/eval-config.nix") {
         inherit system;
         specialArgs = {
-          inherit helium nvidiaPkgs opencode t3code traycer;
+          inherit helium nemoPreview nvidiaPkgs opencode t3code traycer;
         };
         modules = [
           ./configuration.nix
@@ -66,7 +69,7 @@
           {
             environment.systemPackages = [ codexCli ];
             home-manager.extraSpecialArgs = {
-              inherit voxtype helium opencode t3code traycer;
+              inherit voxtype helium nemoPreview opencode t3code traycer;
             };
             programs.codexDesktopLinux = {
               enable = true;

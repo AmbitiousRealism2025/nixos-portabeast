@@ -14,7 +14,9 @@
   imports = [
     ./hardware-configuration.nix
     ./browser.nix
+    ./nemo-preview-integration.nix
     ./onepassword.nix
+    ./storage-integration.nix
   ];
 
   # Preserve the working Calamares bootloader configuration.

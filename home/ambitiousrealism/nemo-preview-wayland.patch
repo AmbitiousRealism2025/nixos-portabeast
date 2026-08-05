@@ -1,0 +1,32 @@
+--- a/src/libnemo-preview/nemo-preview-utils.c
++++ b/src/libnemo-preview/nemo-preview-utils.c
+@@ -99,9 +99,15 @@ GdkWindow *
+ nemo_preview_create_foreign_window (guint xid)
+ {
++  GdkDisplay *display;
+   GdkWindow *retval;
+ 
+-  retval = gdk_x11_window_foreign_new_for_display (gdk_display_get_default (),
++  display = gdk_display_get_default ();
++
++  if (xid == 0 || !GDK_IS_X11_DISPLAY (display))
++    return NULL;
++
++  retval = gdk_x11_window_foreign_new_for_display (display,
+                                                    xid);
+ 
+   return retval;
+ }
+--- a/src/js/ui/mainWindow.js
++++ b/src/js/ui/mainWindow.js
+@@ -641,7 +641,9 @@ MainWindow.prototype = {
+     setParent : function(xid) {
+         this._parent = NemoPreview.create_foreign_window(xid);
+         this._gtkWindow.realize();
+-        this._gtkWindow.get_window().move_to_current_desktop();
++        let window = this._gtkWindow.get_window();
++        if (window.move_to_current_desktop)
++            window.move_to_current_desktop();
+ 
+         if (this._parent)
+             this._gtkWindow.get_window().set_transient_for(this._parent);
