@@ -64,12 +64,18 @@
         patches = (old.patches or [ ]) ++ [ ./home/ambitiousrealism/nemo-preview-wayland.patch ];
       });
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
+      swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix { inherit codexCli; };
       traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
     in
     {
       packages.${system} = {
-        inherit albion claudex cliproxyapi;
+        inherit
+          albion
+          claudex
+          cliproxyapi
+          swiftpointX1
+          ;
         claude-code = claudeCode;
       };
 
@@ -87,6 +93,7 @@
             nemoPreview
             nvidiaPkgs
             opencode
+            swiftpointX1
             t3code
             traycer
             ;

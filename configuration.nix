@@ -18,6 +18,7 @@
     ./nemo-preview-integration.nix
     ./onepassword.nix
     ./storage-integration.nix
+    ./swiftpoint-x1.nix
   ];
 
   # Preserve the working Calamares bootloader configuration.
