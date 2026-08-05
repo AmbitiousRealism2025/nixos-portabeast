@@ -51,6 +51,14 @@
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
       albion = unfreePkgs.callPackage ./pkgs/albion.nix { inherit claudeCode; };
+      cliproxyapi = unfreePkgs.callPackage ./pkgs/cliproxyapi.nix { };
+      claudex = unfreePkgs.callPackage ./pkgs/claudex.nix {
+        inherit
+          claudeCode
+          cliproxyapi
+          codexCli
+          ;
+      };
       helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
       nemoPreview = nixpkgs.legacyPackages.${system}.nemo-preview.overrideAttrs (old: {
         patches = (old.patches or [ ]) ++ [ ./home/ambitiousrealism/nemo-preview-wayland.patch ];
@@ -61,7 +69,7 @@
     in
     {
       packages.${system} = {
-        inherit albion;
+        inherit albion claudex cliproxyapi;
         claude-code = claudeCode;
       };
 
@@ -74,6 +82,7 @@
           inherit
             claudeCode
             albion
+            claudex
             helium
             nemoPreview
             nvidiaPkgs
@@ -92,6 +101,7 @@
               inherit
                 claudeCode
                 albion
+                claudex
                 voxtype
                 helium
                 nemoPreview
