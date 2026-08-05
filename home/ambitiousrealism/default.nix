@@ -8,6 +8,7 @@
     ./helium.nix
     ./hyprland.nix
     ./opencode.nix
+    ./remaining-desktop-apps.nix
     ./shell.nix
     ./t3code.nix
     ./traycer.nix

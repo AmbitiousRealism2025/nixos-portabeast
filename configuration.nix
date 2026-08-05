@@ -219,6 +219,12 @@
       # this entry merely makes the sandboxed desktop wrapper launchable.
       t3code
       traycer
+      # These applications remain Home Manager-owned. Their upstream desktop
+      # entries use bare executable names, so make those names resolvable from
+      # DMS's intentionally restricted service environment.
+      pkgs.easyeffects
+      pkgs.obsidian
+      pkgs.moonlight-qt
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";

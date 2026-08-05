@@ -42,6 +42,67 @@ let
     '';
   };
 
+  clamshellMonitor = pkgs.writeShellApplication {
+    name = "clamshell-monitor";
+    runtimeInputs = with pkgs; [
+      hyprland
+      jq
+      libnotify
+    ];
+    text = ''
+      internal=eDP-1
+      action="''${1:-sync}"
+
+      if [[ $action == sync ]]; then
+        lid_state="$(awk '{ print $2 }' /proc/acpi/button/lid/LID/state 2>/dev/null || true)"
+        if [[ $lid_state == closed ]]; then
+          action=close
+        else
+          action=open
+        fi
+      fi
+
+      case "$action" in
+        close)
+          # Let logind retain ownership of undocked suspend. Only enter
+          # clamshell mode when Hyprland currently has another active output.
+          if ! hyprctl -j monitors \
+            | jq -e --arg internal "$internal" \
+                'any(.[]; .name != $internal and (.disabled | not))' \
+            >/dev/null; then
+            exit 0
+          fi
+
+          hyprctl eval \
+            'hl.monitor({ output = "eDP-1", disabled = true })'
+          notify-send -a Hyprland 'Clamshell mode' \
+            'Laptop display disabled; workspaces moved to the external display.'
+          ;;
+
+        open)
+          # Place the internal panel immediately to the right of all active
+          # external outputs. For the reviewed LG layout this resolves to 2560.
+          right_edge="$({ hyprctl -j monitors || printf '[]'; } \
+            | jq -r --arg internal "$internal" \
+                '[.[] | select(.name != $internal and (.disabled | not))
+                  | (.x + (.width / .scale))]
+                 | (max // 0) | floor')"
+          position="''${right_edge}x0"
+
+          hyprctl eval \
+            "hl.monitor({ output = \"$internal\", disabled = false, mode = \"2560x1600@60.03\", position = \"$position\", scale = 1.6 })"
+          notify-send -a Hyprland 'Laptop display restored' \
+            'The internal display is active to the right of the external display.'
+          ;;
+
+        *)
+          echo "Usage: clamshell-monitor {close|open|sync}" >&2
+          exit 2
+          ;;
+      esac
+    '';
+  };
+
   workspaceBinds = lib.concatMap (
     number:
     let
@@ -61,6 +122,7 @@ in
   # Fuzzel remains a lightweight recovery launcher while DMS is being tested.
   home.packages = with pkgs; [
     brightnessctl
+    clamshellMonitor
     fuzzel
     screenshotRegion
   ];
@@ -121,6 +183,23 @@ in
     systemd.enable = false;
 
     settings = {
+      # Stable physical arrangement for the user's regular desk setup. The LG
+      # is the left output; the scaled 16:10 laptop panel begins at x=2560.
+      monitor = [
+        {
+          output = "desc:LG Electronics LG ULTRAGEAR 301MXUN23894";
+          mode = "2560x1440@164.958";
+          position = "0x0";
+          scale = 1;
+        }
+        {
+          output = "eDP-1";
+          mode = "2560x1600@60.03";
+          position = "2560x0";
+          scale = 1.6;
+        }
+      ];
+
       config = {
         general = {
           gaps_in = 4;
@@ -161,6 +240,30 @@ in
       };
 
       bind = [
+        # With another monitor attached, close the lid into clamshell mode.
+        # With no external output the close helper is a no-op and logind keeps
+        # ownership of the already-tested undocked suspend path.
+        {
+          _args = [
+            "switch:on:Lid Switch"
+            (lua ''hl.dsp.exec_cmd("${clamshellMonitor}/bin/clamshell-monitor close")'')
+            {
+              locked = true;
+              description = "Enter external-display clamshell mode";
+            }
+          ];
+        }
+        {
+          _args = [
+            "switch:off:Lid Switch"
+            (lua ''hl.dsp.exec_cmd("${clamshellMonitor}/bin/clamshell-monitor open")'')
+            {
+              locked = true;
+              description = "Restore the laptop display";
+            }
+          ];
+        }
+
         # Applications: Kitty and the selected Zen browser use direct bindings. DMS
         # Spotlight becomes the primary launcher, with Fuzzel one chord away
         # as a shell-independent recovery fallback.
@@ -212,12 +315,15 @@ in
         (mkNativeBind "SUPER + SHIFT + J" ''hl.dsp.window.move({ direction = "up" })'')
         (mkNativeBind "SUPER + SHIFT + K" ''hl.dsp.window.move({ direction = "down" })'')
         (mkNativeBind "SUPER + SHIFT + L" ''hl.dsp.window.move({ direction = "right" })'')
-        (mkNativeBind "SUPER + TAB" ''hl.dsp.focus({ workspace = "e+1" })'')
-        (mkNativeBind "SUPER + SHIFT + TAB" ''hl.dsp.focus({ workspace = "e-1" })'')
+        # Move among workspaces on the focused monitor, including the next
+        # empty workspace. This gives each physical display an independent
+        # Spaces-like flow while the numbered bindings remain global jumps.
+        (mkNativeBind "SUPER + TAB" ''hl.dsp.focus({ workspace = "r+1" })'')
+        (mkNativeBind "SUPER + SHIFT + TAB" ''hl.dsp.focus({ workspace = "r-1" })'')
         (mkNativeBind "ALT + TAB" "hl.dsp.window.cycle_next({ next = true })")
         (mkNativeBind "ALT + SHIFT + TAB" "hl.dsp.window.cycle_next({ next = false })")
-        (mkNativeBind "SUPER + mouse_down" ''hl.dsp.focus({ workspace = "e+1" })'')
-        (mkNativeBind "SUPER + mouse_up" ''hl.dsp.focus({ workspace = "e-1" })'')
+        (mkNativeBind "SUPER + mouse_down" ''hl.dsp.focus({ workspace = "r+1" })'')
+        (mkNativeBind "SUPER + mouse_up" ''hl.dsp.focus({ workspace = "r-1" })'')
 
         # DMS will later become the control owner. Until then, retain working
         # audio and brightness hardware keys with the existing PipeWire stack.
@@ -293,6 +399,17 @@ in
         }
       ]
       ++ workspaceBinds;
+
+      # Synchronize the monitor state when Hyprland starts with the lid already
+      # open or closed rather than waiting for the first switch transition.
+      on = {
+        _args = [
+          "hyprland.start"
+          (lua ''function()
+            hl.dispatch(hl.dsp.exec_cmd("${clamshellMonitor}/bin/clamshell-monitor sync"))
+          end'')
+        ];
+      };
     };
   };
 }
