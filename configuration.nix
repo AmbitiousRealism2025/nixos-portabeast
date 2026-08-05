@@ -54,6 +54,15 @@
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
+  # Run Tailscale as an ordinary authenticated node. Open its WireGuard UDP
+  # listener for more reliable direct peer connections, but do not enable
+  # subnet-router or exit-node routing features on this workstation.
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
+    useRoutingFeatures = "none";
+  };
+
   # The CachyOS-matched NVIDIA 610 open stack has passed manual s2idle and
   # post-resume application tests. Extend that verified path to lid close on
   # battery and external power. A docked/external-display setup still ignores
