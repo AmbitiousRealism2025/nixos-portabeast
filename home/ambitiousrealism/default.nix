@@ -5,6 +5,7 @@
     ./browser.nix
     ./desktop-tools.nix
     ./file-managers.nix
+    ./geforce-now.nix
     ./helium.nix
     ./hyprland.nix
     ./opencode.nix

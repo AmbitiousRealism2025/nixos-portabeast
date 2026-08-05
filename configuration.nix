@@ -14,6 +14,7 @@
   imports = [
     ./hardware-configuration.nix
     ./browser.nix
+    ./flatpak.nix
     ./nemo-preview-integration.nix
     ./onepassword.nix
     ./storage-integration.nix
