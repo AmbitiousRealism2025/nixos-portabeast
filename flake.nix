@@ -44,7 +44,12 @@
         inherit system;
         config.allowUnfree = true;
       };
+      unfreePkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
+      claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
       helium = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/helium.nix { };
       nemoPreview = nixpkgs.legacyPackages.${system}.nemo-preview.overrideAttrs (old: {
         patches = (old.patches or [ ]) ++ [ ./home/ambitiousrealism/nemo-preview-wayland.patch ];
@@ -54,13 +59,23 @@
       traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
     in
     {
+      packages.${system}.claude-code = claudeCode;
+
       # eval-config reads the release's own .version-suffix and .git-revision.
       # nixpkgs.lib.nixosSystem instead derives these fields from flake source
       # metadata, which a release tarball intentionally does not carry.
       nixosConfigurations.nixos = import (nixpkgs + "/nixos/lib/eval-config.nix") {
         inherit system;
         specialArgs = {
-          inherit helium nemoPreview nvidiaPkgs opencode t3code traycer;
+          inherit
+            claudeCode
+            helium
+            nemoPreview
+            nvidiaPkgs
+            opencode
+            t3code
+            traycer
+            ;
         };
         modules = [
           ./configuration.nix
@@ -69,7 +84,15 @@
           {
             environment.systemPackages = [ codexCli ];
             home-manager.extraSpecialArgs = {
-              inherit voxtype helium nemoPreview opencode t3code traycer;
+              inherit
+                claudeCode
+                voxtype
+                helium
+                nemoPreview
+                opencode
+                t3code
+                traycer
+                ;
             };
             programs.codexDesktopLinux = {
               enable = true;

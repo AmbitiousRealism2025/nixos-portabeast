@@ -226,6 +226,9 @@
       pkgs.easyeffects
       pkgs.obsidian
       pkgs.moonlight-qt
+      # Zed is Home Manager-owned, while DMS runs with a deliberately narrow
+      # service path. Expose the same package so its desktop entry launches.
+      pkgs.zed-editor
     ];
     unitConfig = {
       ConditionEnvironment = "HYPRLAND_INSTANCE_SIGNATURE";
