@@ -1,0 +1,4 @@
+interface:
+  display_name: "NixOS GitHub Backup"
+  short_description: "Safely validate and publish NixOS configuration"
+  default_prompt: "Use $nixos-github-backup to validate, document, and back up my NixOS configuration to GitHub."
