@@ -1,4 +1,9 @@
-# Installed-system NixOS configuration
+# nixos-portabeast
+
+NixOS configuration for the **Portabeast**, a ThinkPad P1 Gen 4. This repository
+is intentionally separate from the NixOS configuration for the mini PC.
+
+## Installed-system configuration
 
 This is the staging tree for the working Calamares installation. It begins as
 a flake wrapper around the exact live `configuration.nix` and generated

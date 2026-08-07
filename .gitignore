@@ -1,0 +1,16 @@
+# Nix build outputs
+result
+result-*
+
+# Local development environments and editor state
+.direnv/
+.envrc.local
+.idea/
+.vscode/
+*~
+*.swp
+
+# Local secrets (commit an example file instead)
+.env
+.env.*
+!.env.example
