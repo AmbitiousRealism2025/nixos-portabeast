@@ -11,7 +11,8 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
   `/nix/store/fdmv3iyxm61iixaxq7vnj5rai591y3kb-nixos-system-nixos-26.05.6815.531670d871c0`
-- **Repository state:** Complete private recovery branch, with Codex Desktop
+- **Repository state:** Complete private recovery configuration on GitHub
+  `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
 - **Activation state:** The repository-only Codex refresh and Zen fix have been
   built but were not activated on the running machine
@@ -88,8 +89,8 @@ Entries are newest first. Git history remains the file-level audit trail.
   and ensure future significant changes are documented consistently.
 - **Validated:** Flake evaluation, complete NixOS build, closure review, and
   current-tree plus full-history secret scans.
-- **State:** Pushed to a review branch; latest repository-only refinements are
-  built but not activated.
+- **State:** Merged into private GitHub `main`; latest repository-only
+  refinements are built but not activated.
 
 ### 2026-08-05 — Applications, development tools, and device integrations
 
