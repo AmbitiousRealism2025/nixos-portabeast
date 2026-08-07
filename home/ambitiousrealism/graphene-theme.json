@@ -1,0 +1,72 @@
+{
+  "id": "graphene",
+  "name": "Graphene",
+  "version": "1.0.0",
+  "author": "ambitiousrealism",
+  "description": "Near-black Graphene surfaces with indigo, electric-blue, and cyan accents derived from Wallhaven md769y",
+  "dark": {},
+  "light": {},
+  "variants": {
+    "type": "multi",
+    "defaults": {
+      "dark": {
+        "accent": "electric-cyan",
+        "flavor": "graphene"
+      },
+      "light": {
+        "accent": "electric-cyan",
+        "flavor": "graphene"
+      }
+    },
+    "flavors": [
+      {
+        "id": "graphene",
+        "name": "Graphene",
+        "dark": {
+          "surface": "#070916",
+          "surfaceText": "#dffcff",
+          "surfaceVariant": "#11142a",
+          "surfaceVariantText": "#a9cbd2",
+          "background": "#000000",
+          "backgroundText": "#e8fdff",
+          "outline": "#424153",
+          "surfaceContainer": "#080c1d",
+          "surfaceContainerHigh": "#10162d",
+          "surfaceContainerHighest": "#182044",
+          "error": "#ef708f",
+          "warning": "#e6b96c",
+          "info": "#66cccc"
+        },
+        "light": {
+          "surface": "#070916",
+          "surfaceText": "#dffcff",
+          "surfaceVariant": "#11142a",
+          "surfaceVariantText": "#a9cbd2",
+          "background": "#000000",
+          "backgroundText": "#e8fdff",
+          "outline": "#424153",
+          "surfaceContainer": "#080c1d",
+          "surfaceContainerHigh": "#10162d",
+          "surfaceContainerHighest": "#182044",
+          "error": "#ef708f",
+          "warning": "#e6b96c",
+          "info": "#66cccc"
+        }
+      }
+    ],
+    "accents": [
+      {
+        "id": "electric-cyan",
+        "name": "Electric Cyan",
+        "graphene": {
+          "primary": "#66cccc",
+          "primaryText": "#001416",
+          "primaryContainer": "#0066cc",
+          "secondary": "#8b8be6",
+          "surfaceTint": "#0066cc"
+        }
+      }
+    ]
+  },
+  "sourceDir": "graphene"
+}

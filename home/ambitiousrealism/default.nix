@@ -2,8 +2,19 @@
 
 {
   imports = [
+    ./browser.nix
+    ./desktop-tools.nix
+    ./development-tools.nix
+    ./file-managers.nix
+    ./geforce-now.nix
+    ./helium.nix
     ./hyprland.nix
+    ./opencode.nix
+    ./remaining-desktop-apps.nix
     ./shell.nix
+    ./t3code.nix
+    ./traycer.nix
+    ./voxtype.nix
   ];
 
   home = {
