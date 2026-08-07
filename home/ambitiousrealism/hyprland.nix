@@ -10,24 +10,97 @@ let
     ];
   };
 
-  mkHyprctlBind =
-    key: dispatcher: argument:
-    mkExecBind key (
-      lib.concatStringsSep " " (
-        [
-          "hyprctl"
-          "dispatch"
-          dispatcher
-        ]
-        ++ lib.optional (argument != "") argument
-      )
-    );
-
   mkNativeBind = key: action: {
     _args = [
       key
       (lua action)
     ];
+  };
+
+  screenshotRegion = pkgs.writeShellApplication {
+    name = "screenshot-region";
+    runtimeInputs = with pkgs; [
+      coreutils
+      grim
+      slurp
+      wl-clipboard
+      libnotify
+      xdg-user-dirs
+    ];
+    text = ''
+      region="$(slurp)" || exit 0
+      [ -n "$region" ] || exit 0
+
+      pictures="$(xdg-user-dir PICTURES)"
+      output_dir="$pictures/Screenshots"
+      mkdir -p "$output_dir"
+      output="$output_dir/$(date +%Y-%m-%d_%H-%M-%S).png"
+
+      grim -g "$region" "$output"
+      wl-copy < "$output"
+      notify-send "Screenshot saved" "$output"
+    '';
+  };
+
+  clamshellMonitor = pkgs.writeShellApplication {
+    name = "clamshell-monitor";
+    runtimeInputs = with pkgs; [
+      hyprland
+      jq
+      libnotify
+    ];
+    text = ''
+      internal=eDP-1
+      action="''${1:-sync}"
+
+      if [[ $action == sync ]]; then
+        lid_state="$(awk '{ print $2 }' /proc/acpi/button/lid/LID/state 2>/dev/null || true)"
+        if [[ $lid_state == closed ]]; then
+          action=close
+        else
+          action=open
+        fi
+      fi
+
+      case "$action" in
+        close)
+          # Let logind retain ownership of undocked suspend. Only enter
+          # clamshell mode when Hyprland currently has another active output.
+          if ! hyprctl -j monitors \
+            | jq -e --arg internal "$internal" \
+                'any(.[]; .name != $internal and (.disabled | not))' \
+            >/dev/null; then
+            exit 0
+          fi
+
+          hyprctl eval \
+            'hl.monitor({ output = "eDP-1", disabled = true })'
+          notify-send -a Hyprland 'Clamshell mode' \
+            'Laptop display disabled; workspaces moved to the external display.'
+          ;;
+
+        open)
+          # Place the internal panel immediately to the right of all active
+          # external outputs. For the reviewed LG layout this resolves to 2560.
+          right_edge="$({ hyprctl -j monitors || printf '[]'; } \
+            | jq -r --arg internal "$internal" \
+                '[.[] | select(.name != $internal and (.disabled | not))
+                  | (.x + (.width / .scale))]
+                 | (max // 0) | floor')"
+          position="''${right_edge}x0"
+
+          hyprctl eval \
+            "hl.monitor({ output = \"$internal\", disabled = false, mode = \"2560x1600@60.03\", position = \"$position\", scale = 1.6 })"
+          notify-send -a Hyprland 'Laptop display restored' \
+            'The internal display is active to the right of the external display.'
+          ;;
+
+        *)
+          echo "Usage: clamshell-monitor {close|open|sync}" >&2
+          exit 2
+          ;;
+      esac
+    '';
   };
 
   workspaceBinds = lib.concatMap (
@@ -46,13 +119,58 @@ let
   ) (lib.range 1 9);
 in
 {
-  # Fuzzel is a temporary lightweight launcher until DMS Spotlight is added
-  # and tested in its own generation.
+  # Fuzzel remains a lightweight recovery launcher while DMS is being tested.
   home.packages = with pkgs; [
     brightnessctl
+    clamshellMonitor
     fuzzel
+    screenshotRegion
   ];
-  home.sessionVariables.TERMINAL = "konsole";
+  home.sessionVariables.TERMINAL = "kitty";
+
+  programs.kitty = {
+    enable = true;
+    keybindings = {
+      "alt+shift+c" = "copy_to_clipboard";
+      "alt+shift+v" = "paste_from_clipboard";
+    };
+    settings = {
+      confirm_os_window_close = 0;
+
+      # Graphene terminal palette: quiet near-black surfaces with the
+      # wallpaper's cyan, electric-blue, indigo, and charcoal-violet accents.
+      background = "#000000";
+      foreground = "#dffcff";
+      selection_background = "#333399";
+      selection_foreground = "#ffffff";
+      cursor = "#66cccc";
+      cursor_text_color = "#000000";
+      url_color = "#66cccc";
+      active_border_color = "#66cccc";
+      inactive_border_color = "#424153";
+      active_tab_background = "#0066cc";
+      active_tab_foreground = "#ffffff";
+      inactive_tab_background = "#11142a";
+      inactive_tab_foreground = "#a9cbd2";
+
+      color0 = "#000000";
+      color1 = "#ef708f";
+      color2 = "#66cccc";
+      color3 = "#e6b96c";
+      color4 = "#0066cc";
+      color5 = "#8b8be6";
+      color6 = "#66cccc";
+      color7 = "#dffcff";
+      color8 = "#424153";
+      color9 = "#ff8eaa";
+      color10 = "#8ee6e6";
+      color11 = "#f4cf8d";
+      color12 = "#4b91ff";
+      color13 = "#adadff";
+      color14 = "#9af2f2";
+      color15 = "#ffffff";
+    };
+  };
 
   wayland.windowManager.hyprland = {
     enable = true;
@@ -65,12 +183,33 @@ in
     systemd.enable = false;
 
     settings = {
+      # Stable physical arrangement for the user's regular desk setup. The LG
+      # is the left output; the scaled 16:10 laptop panel begins at x=2560.
+      monitor = [
+        {
+          output = "desc:LG Electronics LG ULTRAGEAR 301MXUN23894";
+          mode = "2560x1440@164.958";
+          position = "0x0";
+          scale = 1;
+        }
+        {
+          output = "eDP-1";
+          mode = "2560x1600@60.03";
+          position = "2560x0";
+          scale = 1.6;
+        }
+      ];
+
       config = {
         general = {
-          gaps_in = 12;
-          gaps_out = 12;
-          border_size = 4;
+          gaps_in = 4;
+          gaps_out = 4;
+          border_size = 2;
           layout = "dwindle";
+          "col.active_border" = "rgba(66ccccff)";
+          "col.inactive_border" = "rgba(424153cc)";
+          "col.nogroup_border_active" = "rgba(0066ccff)";
+          "col.nogroup_border" = "rgba(333399aa)";
         };
         decoration = {
           rounding = 10;
@@ -80,6 +219,13 @@ in
             enabled = true;
             size = 4;
             passes = 2;
+          };
+          shadow = {
+            enabled = true;
+            range = 8;
+            render_power = 2;
+            color = "rgba(0066cc44)";
+            color_inactive = "rgba(00000055)";
           };
         };
         animations.enabled = true;
@@ -94,33 +240,90 @@ in
       };
 
       bind = [
-        # Applications: keep the proven Plasma applications in this minimal
-        # session. Kitty and DMS replace these temporary choices later.
-        (mkExecBind "SUPER + RETURN" "uwsm app -- /run/current-system/sw/bin/konsole")
-        (mkExecBind "SUPER + SHIFT + RETURN" "uwsm app -- /run/current-system/sw/bin/firefox")
-        (mkExecBind "SUPER + SPACE" "uwsm app -- ${pkgs.fuzzel}/bin/fuzzel")
+        # With another monitor attached, close the lid into clamshell mode.
+        # With no external output the close helper is a no-op and logind keeps
+        # ownership of the already-tested undocked suspend path.
+        {
+          _args = [
+            "switch:on:Lid Switch"
+            (lua ''hl.dsp.exec_cmd("${clamshellMonitor}/bin/clamshell-monitor close")'')
+            {
+              locked = true;
+              description = "Enter external-display clamshell mode";
+            }
+          ];
+        }
+        {
+          _args = [
+            "switch:off:Lid Switch"
+            (lua ''hl.dsp.exec_cmd("${clamshellMonitor}/bin/clamshell-monitor open")'')
+            {
+              locked = true;
+              description = "Restore the laptop display";
+            }
+          ];
+        }
+
+        # Applications: Kitty and the selected Zen browser use direct bindings. DMS
+        # Spotlight becomes the primary launcher, with Fuzzel one chord away
+        # as a shell-independent recovery fallback.
+        (mkExecBind "SUPER + RETURN" "uwsm app -- ${pkgs.kitty}/bin/kitty")
+        (mkExecBind "SUPER + SHIFT + RETURN" "uwsm app -- /run/current-system/sw/bin/zen")
+        (mkExecBind "SUPER + SPACE" "${pkgs.dms-shell}/bin/dms ipc call spotlight toggle")
+        (mkExecBind "SUPER + SHIFT + SPACE" "uwsm app -- ${pkgs.fuzzel}/bin/fuzzel")
+
+        # Voxtype owns no global input device. Hyprland invokes its local daemon
+        # through the ordinary client command when bare Insert is pressed.
+        (mkExecBind "INSERT" "voxtype record toggle")
+
+        # Omarchy-shaped shell controls, translated to DMS 1.4.6 IPC methods
+        # verified from the package in the pinned NixOS release.
+        (mkExecBind "SUPER + ALT + SPACE" "${pkgs.dms-shell}/bin/dms ipc call settings focusOrToggle")
+        (mkExecBind "SUPER + ESCAPE" "${pkgs.dms-shell}/bin/dms ipc call powermenu toggle")
+        (mkExecBind "SUPER + CTRL + L" "${pkgs.dms-shell}/bin/dms ipc call lock lock")
+        (mkExecBind "SUPER + CTRL + V" "${pkgs.dms-shell}/bin/dms ipc call clipboard toggle")
+        (mkExecBind "SUPER + CTRL + SPACE" "${pkgs.dms-shell}/bin/dms ipc call dankdash wallpaper")
+
+        # Omarchy's region-capture workflow: save under XDG Pictures, copy the
+        # PNG to the clipboard, and show the final path in a notification.
+        (mkExecBind "PRINT" "${screenshotRegion}/bin/screenshot-region")
+
+        # Apple-shaped editing muscle memory. Hyprland translates these
+        # focused-window shortcuts natively, while physical Ctrl+C remains
+        # available for terminal interrupts. Kitty owns its shifted copy and
+        # paste variants above so they never collide with shell control keys.
+        (mkNativeBind "ALT + C" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "C" })'')
+        (mkNativeBind "ALT + V" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "V" })'')
+        (mkNativeBind "ALT + X" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "X" })'')
+        (mkNativeBind "ALT + Z" ''hl.dsp.send_shortcut({ mods = "CTRL", key = "Z" })'')
 
         # Omarchy-compatible tiling and focus muscle memory.
-        (mkNativeBind "SUPER + W" "hl.dsp.window.close()")
+        (mkNativeBind "SUPER + Q" "hl.dsp.window.close()")
         (mkNativeBind "SUPER + T" ''hl.dsp.window.float({ action = "toggle" })'')
-        (mkNativeBind "SUPER + J" ''hl.dsp.layout("togglesplit")'')
         (mkNativeBind "SUPER + P" "hl.dsp.window.pseudo()")
-        (mkHyprctlBind "SUPER + F" "fullscreen" "0")
-        (mkHyprctlBind "SUPER + ALT + F" "fullscreen" "1")
-        (mkNativeBind "SUPER + LEFT" ''hl.dsp.focus({ direction = "left" })'')
-        (mkNativeBind "SUPER + RIGHT" ''hl.dsp.focus({ direction = "right" })'')
-        (mkNativeBind "SUPER + UP" ''hl.dsp.focus({ direction = "up" })'')
-        (mkNativeBind "SUPER + DOWN" ''hl.dsp.focus({ direction = "down" })'')
-        (mkNativeBind "SUPER + SHIFT + LEFT" ''hl.dsp.window.move({ direction = "left" })'')
-        (mkNativeBind "SUPER + SHIFT + RIGHT" ''hl.dsp.window.move({ direction = "right" })'')
-        (mkNativeBind "SUPER + SHIFT + UP" ''hl.dsp.window.move({ direction = "up" })'')
-        (mkNativeBind "SUPER + SHIFT + DOWN" ''hl.dsp.window.move({ direction = "down" })'')
-        (mkNativeBind "SUPER + TAB" ''hl.dsp.focus({ workspace = "e+1" })'')
-        (mkNativeBind "SUPER + SHIFT + TAB" ''hl.dsp.focus({ workspace = "e-1" })'')
-        (mkHyprctlBind "ALT + TAB" "cyclenext" "")
-        (mkHyprctlBind "ALT + SHIFT + TAB" "cyclenext" "prev")
-        (mkNativeBind "SUPER + mouse_down" ''hl.dsp.focus({ workspace = "e+1" })'')
-        (mkNativeBind "SUPER + mouse_up" ''hl.dsp.focus({ workspace = "e-1" })'')
+        (mkNativeBind "SUPER + W" ''
+          hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })
+        '')
+        (mkNativeBind "SUPER + F" ''
+          hl.dsp.window.fullscreen({ mode = "maximized", action = "toggle" })
+        '')
+        (mkNativeBind "SUPER + H" ''hl.dsp.focus({ direction = "left" })'')
+        (mkNativeBind "SUPER + J" ''hl.dsp.focus({ direction = "up" })'')
+        (mkNativeBind "SUPER + K" ''hl.dsp.focus({ direction = "down" })'')
+        (mkNativeBind "SUPER + L" ''hl.dsp.focus({ direction = "right" })'')
+        (mkNativeBind "SUPER + SHIFT + H" ''hl.dsp.window.move({ direction = "left" })'')
+        (mkNativeBind "SUPER + SHIFT + J" ''hl.dsp.window.move({ direction = "up" })'')
+        (mkNativeBind "SUPER + SHIFT + K" ''hl.dsp.window.move({ direction = "down" })'')
+        (mkNativeBind "SUPER + SHIFT + L" ''hl.dsp.window.move({ direction = "right" })'')
+        # Move among workspaces on the focused monitor, including the next
+        # empty workspace. This gives each physical display an independent
+        # Spaces-like flow while the numbered bindings remain global jumps.
+        (mkNativeBind "SUPER + TAB" ''hl.dsp.focus({ workspace = "r+1" })'')
+        (mkNativeBind "SUPER + SHIFT + TAB" ''hl.dsp.focus({ workspace = "r-1" })'')
+        (mkNativeBind "ALT + TAB" "hl.dsp.window.cycle_next({ next = true })")
+        (mkNativeBind "ALT + SHIFT + TAB" "hl.dsp.window.cycle_next({ next = false })")
+        (mkNativeBind "SUPER + mouse_down" ''hl.dsp.focus({ workspace = "r+1" })'')
+        (mkNativeBind "SUPER + mouse_up" ''hl.dsp.focus({ workspace = "r-1" })'')
 
         # DMS will later become the control owner. Until then, retain working
         # audio and brightness hardware keys with the existing PipeWire stack.
@@ -196,6 +399,17 @@ in
         }
       ]
       ++ workspaceBinds;
+
+      # Synchronize the monitor state when Hyprland starts with the lid already
+      # open or closed rather than waiting for the first switch transition.
+      on = {
+        _args = [
+          "hyprland.start"
+          (lua ''function()
+            hl.dispatch(hl.dsp.exec_cmd("${clamshellMonitor}/bin/clamshell-monitor sync"))
+          end'')
+        ];
+      };
     };
   };
 }
