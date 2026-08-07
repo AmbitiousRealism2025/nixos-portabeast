@@ -19,6 +19,11 @@ in
 appimageTools.wrapType2 {
   inherit pname src version;
 
+  # Firefox-family browsers load FFmpeg dynamically for H.264/AAC playback.
+  # Keep Zen on FFmpeg 7 because its current Linux build is incompatible with
+  # FFmpeg 8, which otherwise breaks some YouTube live streams.
+  extraPkgs = pkgs: [ pkgs.ffmpeg_7 ];
+
   nativeBuildInputs = [ makeWrapper ];
 
   extraInstallCommands = ''
