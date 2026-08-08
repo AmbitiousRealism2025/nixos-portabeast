@@ -6,16 +6,17 @@ configuration and is intentionally separate from the mini PC configuration.
 
 ## Current validated snapshot
 
-- **Last reviewed:** 2026-08-07
+- **Last reviewed:** 2026-08-08
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/fdmv3iyxm61iixaxq7vnj5rai591y3kb-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/brnmqiz58h0ipkmqmnq1gqjmvpcrpvdc-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
-- **Activation state:** The repository-only Codex refresh and Zen fix have been
-  built but were not activated on the running machine
+- **Activation state:** The Albion permission compatibility fix is activated
+  and user-tested. The repository-only Codex refresh remains built but is not
+  activated on the running machine.
 
 ## What this restores
 
@@ -78,6 +79,20 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-08 — Repair Albion file-edit deny rules
+
+- **Changed:** Translate Albion's legacy path-scoped `Write(...)` deny rules to
+  Claude Code's current `Edit(...)` permission namespace and fail the Albion
+  package check if legacy rules return.
+- **Reason:** Claude Code 2.1.222 rejected the old rules at startup, leaving the
+  intended edit restrictions for environment files, secrets, SSH/AWS data,
+  private keys, and credential files inactive.
+- **Validated:** Warning-free Claude launch, isolated Albion build, complete
+  NixOS build, closure review against the running generation, and current-tree
+  plus full-history secret scans.
+- **State:** Activated from an isolated candidate based on the exact prior
+  running closure; warning-free launch confirmed and user-tested.
 
 ### 2026-08-07 — Reproducible GitHub recovery workflow
 

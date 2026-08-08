@@ -30,6 +30,14 @@ stdenvNoCC.mkDerivation rec {
   nativeBuildInputs = [ makeWrapper ];
   dontBuild = true;
 
+  # Claude Code 2.1.222 rejects path-scoped Write rules. Edit rules cover all
+  # built-in file-editing tools, so translate Albion's legacy deny entries
+  # while retaining their protected paths.
+  postPatch = ''
+    substituteInPlace config/albion-settings.json \
+      --replace-fail '"Write(' '"Edit('
+  '';
+
   installPhase =
     let
       runtimePath = lib.makeBinPath [
@@ -94,6 +102,10 @@ stdenvNoCC.mkDerivation rec {
     grep -Fq 'model=glm-5.2[1m]' "$TMPDIR/albion-dry-run"
     grep -Fq "plugin-dir $out/share/albion/plugin" "$TMPDIR/albion-dry-run"
     grep -Fq "settings $out/share/albion/config/albion-settings.json" "$TMPDIR/albion-dry-run"
+    ! grep -Fq '"Write(' "$out/share/albion/config/albion-settings.json"
+    grep -Fq '"Edit(.env)"' "$out/share/albion/config/albion-settings.json"
+    grep -Fq '"Edit(**/secrets/**)"' "$out/share/albion/config/albion-settings.json"
+    grep -Fq '"Edit(~/.ssh/**)"' "$out/share/albion/config/albion-settings.json"
     "$out/bin/albion-compile" --check
     test "$("$out/bin/claude" --version)" = '2.1.222 (Claude Code)'
     test "$("$out/bin/claude-stock" --version)" = '2.1.222 (Claude Code)'
