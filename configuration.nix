@@ -6,6 +6,7 @@
   opencode,
   piCli,
   pkgs,
+  primeAgent,
   t3code,
   traycer,
   ...
@@ -328,6 +329,7 @@
     mesa-demos
     pciutils
     piCli
+    primeAgent
     usbutils
     vulkan-tools
   ];

@@ -67,6 +67,10 @@
       });
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
       piCli = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/pi-coding-agent.nix { };
+      primeAgentRuntime = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent-runtime.nix { };
+      primeAgent = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent.nix {
+        inherit primeAgentRuntime;
+      };
       swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix {
         inherit albion codexCli cursorCli;
@@ -80,6 +84,7 @@
           azeronSoftware
           claudex
           cliproxyapi
+          primeAgent
           swiftpointX1
           ;
         claude-code = claudeCode;
@@ -101,6 +106,7 @@
             nvidiaPkgs
             opencode
             piCli
+            primeAgent
             swiftpointX1
             t3code
             traycer
