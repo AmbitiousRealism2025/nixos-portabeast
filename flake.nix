@@ -66,7 +66,9 @@
       });
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
       swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
-      t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix { inherit codexCli; };
+      t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix {
+        inherit albion codexCli;
+      };
       traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
     in
     {

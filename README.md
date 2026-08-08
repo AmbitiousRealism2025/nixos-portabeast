@@ -80,6 +80,18 @@ The canonical workflow is stored in the repository's
 
 Entries are newest first. Git history remains the file-level audit trail.
 
+### 2026-08-08 — Restore T3 Claude provider discovery
+
+- **Changed:** Expose the declarative Albion `claude` launcher inside T3 Code's
+  AppImage FHS environment while preserving its existing Codex proxy.
+- **Reason:** T3 reconstructed its sandbox PATH without Albion, so its Claude
+  provider reported that Claude Code was unavailable even though terminal
+  launches worked.
+- **Validated:** Package and complete NixOS builds plus inspection of the T3
+  backend environment and provider discovery behavior.
+- **State:** Built only; activation and the in-app Claude provider test remain
+  pending.
+
 ### 2026-08-08 — Repair Albion file-edit deny rules
 
 - **Changed:** Translate Albion's legacy path-scoped `Write(...)` deny rules to

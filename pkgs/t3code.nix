@@ -1,4 +1,5 @@
 {
+  albion,
   appimageTools,
   codexCli,
   fetchurl,
@@ -23,6 +24,11 @@ let
   base = appimageTools.wrapType2 {
     inherit pname src version;
 
+    # The AppImage runs in an FHS environment that reconstructs PATH, so an
+    # outer launcher prefix alone is not reliable. Expose Albion inside the
+    # sandbox where T3 performs its Claude executable discovery.
+    extraPkgs = _pkgs: [ albion ];
+
     meta = {
       description = "Desktop interface for coding agents";
       homepage = "https://t3.codes/";
@@ -42,11 +48,14 @@ let
     '';
   };
   launcher = writeShellScriptBin "t3code" ''
-    export PATH=${codexForT3}/bin:$PATH
+    export PATH=${codexForT3}/bin:${albion}/bin:$PATH
     exec ${base}/bin/t3code "$@"
   '';
 in
 runCommand "${pname}-${version}" { meta = base.meta; } ''
+  test -x ${albion}/bin/claude
+  test -x ${codexForT3}/bin/codex
+
   mkdir -p "$out/bin"
   ln -s ${launcher}/bin/t3code "$out/bin/t3code"
 
