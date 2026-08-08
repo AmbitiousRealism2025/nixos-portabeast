@@ -79,6 +79,21 @@ The canonical workflow is stored in the repository's
 
 Entries are newest first. Git history remains the file-level audit trail.
 
+### 2026-08-08 — Repair Albion file-edit deny rules
+
+- **Changed:** Translate Albion's legacy path-scoped `Write(...)` deny rules to
+  Claude Code's current `Edit(...)` permission namespace and fail the Albion
+  package check if legacy rules return.
+- **Reason:** Claude Code 2.1.222 rejected the old rules at startup, leaving the
+  intended edit restrictions for environment files, secrets, SSH/AWS data,
+  private keys, and credential files inactive.
+- **Validated:** Warning-free Claude launch, isolated Albion build, complete
+  NixOS build, closure review against the running generation, and current-tree
+  plus full-history secret scans.
+- **State:** Built only; an isolated activation candidate based on the exact
+  running closure is ready but was not activated from the restricted build
+  environment.
+
 ### 2026-08-07 — Reproducible GitHub recovery workflow
 
 - **Changed:** Synchronized the complete accepted `/etc/nixos` history into the
