@@ -10,14 +10,15 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/835bqif4l33dbfm87ks1r47brkh48qij-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/dpjxi65n8j86fq697m0xg5gabiq672bn-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
 - **Activation state:** The Albion permission compatibility fix is activated
   and user-tested. Cursor Agent CLI is activated; its T3 provider restart and
-  login test remain pending. The repository-only Codex refresh remains built
-  but is not activated on the running machine.
+  login test remain pending. Pi 0.84.1 is activated and tested with Codex. The
+  repository-only Codex refresh remains built but is not activated on the
+  running machine.
 
 ## What this restores
 
@@ -26,8 +27,8 @@ configuration and is intentionally separate from the mini PC configuration.
 - NVIDIA PRIME/offload, power-management, suspend, and hibernation policy
 - Zram, Bluetooth, Tailscale, portals, storage integration, and device rules
 - Pinned desktop and development tools, including Codex Desktop, T3 Code,
-  OpenCode, Traycer, Albion/Claude, Claudex, Zen, Nemo/Yazi, Swiftpoint, and
-  Azeron integrations
+  OpenCode, Pi, Traycer, Albion/Claude, Claudex, Zen, Nemo/Yazi, Swiftpoint,
+  and Azeron integrations
 - The machine-specific filesystem and boot configuration in
   `hardware-configuration.nix`
 
@@ -80,6 +81,18 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-08 — Add the Pi coding agent
+
+- **Changed:** Pin `pi-coding-agent` 0.84.1 directly to the matching
+  `earendil-works/pi` release, npm dependency closure, and generated provider
+  model catalog. Disable its mutable self-update check and telemetry by
+  default in the Nix wrapper.
+- **Reason:** Make the Pi interactive coding-agent CLI available globally as
+  the `pi` command without relying on a mutable npm installation.
+- **Validated:** Independent source/model hashes, fixed npm dependency hash,
+  package version check, wrapper inspection, and complete NixOS build.
+- **State:** Version 0.84.1 is activated and tested with Codex.
 
 ### 2026-08-08 — Add Cursor Agent CLI for T3 Code
 

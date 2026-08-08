@@ -4,6 +4,7 @@
   lib,
   nvidiaPkgs,
   opencode,
+  piCli,
   pkgs,
   t3code,
   traycer,
@@ -326,6 +327,7 @@
     git
     mesa-demos
     pciutils
+    piCli
     usbutils
     vulkan-tools
   ];

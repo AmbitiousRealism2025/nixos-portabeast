@@ -66,6 +66,7 @@
         patches = (old.patches or [ ]) ++ [ ./home/ambitiousrealism/nemo-preview-wayland.patch ];
       });
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
+      piCli = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/pi-coding-agent.nix { };
       swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix {
         inherit albion codexCli cursorCli;
@@ -99,6 +100,7 @@
             nemoPreview
             nvidiaPkgs
             opencode
+            piCli
             swiftpointX1
             t3code
             traycer
