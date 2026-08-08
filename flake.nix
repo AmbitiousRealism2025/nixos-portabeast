@@ -49,6 +49,7 @@
         config.allowUnfree = true;
       };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
+      cursorCli = unfreePkgs.cursor-cli;
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
       albion = unfreePkgs.callPackage ./pkgs/albion.nix { inherit claudeCode; };
       azeronSoftware = unfreePkgs.callPackage ./pkgs/azeron-software.nix { };
@@ -67,7 +68,7 @@
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
       swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix {
-        inherit albion codexCli;
+        inherit albion codexCli cursorCli;
       };
       traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
     in
@@ -108,7 +109,10 @@
           home-manager.nixosModules.home-manager
           codex-desktop-linux.nixosModules.default
           {
-            environment.systemPackages = [ codexCli ];
+            environment.systemPackages = [
+              codexCli
+              cursorCli
+            ];
             home-manager.extraSpecialArgs = {
               inherit
                 claudeCode

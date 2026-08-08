@@ -10,13 +10,14 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/brnmqiz58h0ipkmqmnq1gqjmvpcrpvdc-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/835bqif4l33dbfm87ks1r47brkh48qij-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
 - **Activation state:** The Albion permission compatibility fix is activated
-  and user-tested. The repository-only Codex refresh remains built but is not
-  activated on the running machine.
+  and user-tested. Cursor Agent CLI is activated; its T3 provider restart and
+  login test remain pending. The repository-only Codex refresh remains built
+  but is not activated on the running machine.
 
 ## What this restores
 
@@ -79,6 +80,18 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-08 — Add Cursor Agent CLI for T3 Code
+
+- **Changed:** Install the pinned nixpkgs `cursor-cli` package system-wide and
+  expose a Nix-managed `agent` compatibility launcher inside T3 Code's AppImage
+  environment.
+- **Reason:** T3 v0.0.24 searches for the former `agent` command name, while
+  the current Cursor package exposes `cursor-agent`.
+- **Validated:** Cursor package and complete NixOS builds, version checks for
+  both command paths, and inspection of T3's generated FHS filesystem.
+- **State:** Activated from an isolated candidate based on the prior running
+  closure; Cursor login and the in-app provider test remain pending.
 
 ### 2026-08-08 — Restore T3 Claude provider discovery
 

@@ -2,6 +2,7 @@
   albion,
   appimageTools,
   codexCli,
+  cursorCli,
   fetchurl,
   lib,
   python3,
@@ -25,9 +26,12 @@ let
     inherit pname src version;
 
     # The AppImage runs in an FHS environment that reconstructs PATH, so an
-    # outer launcher prefix alone is not reliable. Expose Albion inside the
-    # sandbox where T3 performs its Claude executable discovery.
-    extraPkgs = _pkgs: [ albion ];
+    # outer launcher prefix alone is not reliable. Expose provider launchers
+    # inside the sandbox where T3 performs executable discovery.
+    extraPkgs = _pkgs: [
+      albion
+      cursorAgentForT3
+    ];
 
     meta = {
       description = "Desktop interface for coding agents";
@@ -47,14 +51,21 @@ let
         ${codexCli}/bin/codex "$@"
     '';
   };
+  # T3 v0.0.24 still discovers Cursor Agent under its former `agent` command
+  # name, while the current nixpkgs package exposes `cursor-agent`.
+  cursorAgentForT3 = writeShellScriptBin "agent" ''
+    exec ${cursorCli}/bin/cursor-agent "$@"
+  '';
   launcher = writeShellScriptBin "t3code" ''
-    export PATH=${codexForT3}/bin:${albion}/bin:$PATH
+    export PATH=${codexForT3}/bin:${albion}/bin:${cursorAgentForT3}/bin:$PATH
     exec ${base}/bin/t3code "$@"
   '';
 in
 runCommand "${pname}-${version}" { meta = base.meta; } ''
   test -x ${albion}/bin/claude
   test -x ${codexForT3}/bin/codex
+  test -x ${cursorCli}/bin/cursor-agent
+  test -x ${cursorAgentForT3}/bin/agent
 
   mkdir -p "$out/bin"
   ln -s ${launcher}/bin/t3code "$out/bin/t3code"
