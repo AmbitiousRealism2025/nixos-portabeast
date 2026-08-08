@@ -17,7 +17,7 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Activation state:** The Albion permission compatibility fix is activated
   and user-tested. Cursor Agent CLI is activated; its T3 provider restart and
   login test remain pending. Pi 0.84.1 is activated and tested with Codex. The
-  Prime Agent 0.7.1 configuration is built but not yet activated. The
+  Prime Agent 0.7.1 is activated; provider login remains pending. The
   repository-only Codex refresh remains built but is not activated on the
   running machine.
 
@@ -93,7 +93,9 @@ Entries are newest first. Git history remains the file-level audit trail.
   globally without relying on its mutable installer or runtime package setup.
 - **Validated:** Release and npm hashes, CLI version, Python import checks,
   native-library patching, and a complete NixOS build.
-- **State:** Built only; activation and provider login remain pending.
+- **State:** Activated from an isolated candidate based on the prior running
+  closure; CLI version and kernel environment verified. Provider login remains
+  pending.
 
 ### 2026-08-08 — Add the Pi coding agent
 
