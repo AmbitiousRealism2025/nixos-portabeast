@@ -49,6 +49,7 @@
         config.allowUnfree = true;
       };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
+      cursorCli = unfreePkgs.cursor-cli;
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
       albion = unfreePkgs.callPackage ./pkgs/albion.nix { inherit claudeCode; };
       azeronSoftware = unfreePkgs.callPackage ./pkgs/azeron-software.nix { };
@@ -65,9 +66,14 @@
         patches = (old.patches or [ ]) ++ [ ./home/ambitiousrealism/nemo-preview-wayland.patch ];
       });
       opencode = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/opencode.nix { };
+      piCli = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/pi-coding-agent.nix { };
+      primeAgentRuntime = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent-runtime.nix { };
+      primeAgent = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent.nix {
+        inherit primeAgentRuntime;
+      };
       swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix {
-        inherit albion codexCli;
+        inherit albion codexCli cursorCli;
       };
       traycer = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/traycer.nix { };
     in
@@ -78,6 +84,7 @@
           azeronSoftware
           claudex
           cliproxyapi
+          primeAgent
           swiftpointX1
           ;
         claude-code = claudeCode;
@@ -98,6 +105,8 @@
             nemoPreview
             nvidiaPkgs
             opencode
+            piCli
+            primeAgent
             swiftpointX1
             t3code
             traycer
@@ -108,7 +117,10 @@
           home-manager.nixosModules.home-manager
           codex-desktop-linux.nixosModules.default
           {
-            environment.systemPackages = [ codexCli ];
+            environment.systemPackages = [
+              codexCli
+              cursorCli
+            ];
             home-manager.extraSpecialArgs = {
               inherit
                 claudeCode

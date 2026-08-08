@@ -4,7 +4,9 @@
   lib,
   nvidiaPkgs,
   opencode,
+  piCli,
   pkgs,
+  primeAgent,
   t3code,
   traycer,
   ...
@@ -326,6 +328,8 @@
     git
     mesa-demos
     pciutils
+    piCli
+    primeAgent
     usbutils
     vulkan-tools
   ];
