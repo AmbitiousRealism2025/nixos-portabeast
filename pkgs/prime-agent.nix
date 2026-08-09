@@ -63,6 +63,17 @@ buildNpmPackageNode22 {
       -type f -name addon.node \
       ! -path '*/linux/x64/node/glibc-127-Release/addon.node' \
       -delete
+
+    # Temporary 0.7.1 hotfix: the Codex model-discovery endpoint treats
+    # Prime's package version as an obsolete Codex client version and returns
+    # an empty catalog. Use the installed Codex CLI protocol version until
+    # upstream decouples these versions; otherwise RLM cannot select sibling
+    # OpenAI-Codex subscription models such as GPT-5.6 Luna.
+    codex_catalog_bundle="$out/lib/node_modules/prime-agent/dist/bundle/chunk-PNKBOUZJ.js"
+    substituteInPlace "$codex_catalog_bundle" \
+      --replace-fail \
+      'url2.searchParams.set("client_version", VERSION);' \
+      'url2.searchParams.set("client_version", "0.146.0");'
   '';
 
   postFixup = ''
