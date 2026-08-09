@@ -68,6 +68,71 @@ The Git history records the accepted configuration layers and provides a useful
 audit trail, but a NixOS boot generation remains the immediate local rollback
 mechanism.
 
+## Recovery ledger — coding-tool update checker
+
+The checker is a declarative report generator, never a mutator: it reads the
+repository and the store closure and writes only under
+`~/.local/state/coding-tool-update-check/`. Nothing it produces is needed to
+rebuild or activate the system, so restoring this repository is sufficient for
+recovery. The checker source/tests/package live in the **private standalone
+flake** `github:AmbitiousRealism2025/coding-tool-update-check` (pinned in this
+repository's `flake.lock`); this repository only consumes it as a flake input
+and wires the timer. To recreate or refresh the reports after a restore:
+
+```sh
+# One-shot check with release-note summarization and notifications:
+coding-tools-update-check --repo-root /home/ambitiousrealism/nixos-codex-desktop --summarize
+
+# Dry run (prints the Markdown + JSON report, writes nothing):
+coding-tools-update-check --repo-root /home/ambitiousrealism/nixos-codex-desktop --dry-run --no-notify
+
+# Machine-readable JSON of the current run (also written to latest.json):
+coding-tools-update-check --repo-root /home/ambitiousrealism/nixos-codex-desktop --json | jq .
+
+# Print the newest Markdown report without running a new check (no network):
+coding-tools-update-check --show
+
+# Force: notify even if that version was already reported (never installs anything):
+coding-tools-update-check --repo-root /home/ambitiousrealism/nixos-codex-desktop --force
+
+# Offline run (installed vs declared only, no network):
+coding-tools-update-check --repo-root /home/ambitiousrealism/nixos-codex-desktop --offline --no-notify
+```
+
+Monitored tools (exactly the requested set): Codex CLI and Codex Desktop, T3
+Code, Cursor (GUI) and the Cursor Agent CLI, Pi, and Prime Agent. OpenCode,
+Claude Code, Albion and Claudex are not monitored; OpenCode is only the
+release-note summarization runtime.
+
+- `latest.md` / `latest.json` are the newest report; `reports/` keeps the last
+  30 dated reports (override with `--retention`); report filenames carry a
+  microsecond timestamp so back-to-back runs never overwrite each other.
+- `state.json` remembers which upstream versions were already notified, so the
+  same version is never reported twice. A version is only marked as notified
+  after `notify-send` actually delivered the notification; `--force` bypasses
+  the suppression without installing or caching anything.
+- If every upstream check fails, one concise failure notification is sent;
+  partial errors are only recorded in the report. Success notifications
+  (`--notify-success`) are off by default.
+- If a report is accidentally deleted, the next timer run regenerates it; no
+  other state needs manual repair.
+- The Home Manager timer/service is defined in
+  `home/ambitiousrealism/update-checker.nix` (`services.codingToolsUpdateCheck`);
+  it persists across rebuilds and activations once enabled. Its options
+  (`summarize`, `notify`, `notifyOnSuccess` — the latter default false, and
+  `onCalendar` — default `"daily"`) are wired into the actual service flags
+  and timer, and the service unit requests network-online ordering where
+  available. The timer stays randomized (`RandomizedDelaySec`, default 6h) and
+  persistent (`Persistent = true`).
+- Summarization uses the exact runtime model `opencode/deepseek-v4-flash-free`
+  and refuses to substitute any other model: the model is verified with
+  `opencode models` before each summarization, and a model failure is reported
+  clearly while the deterministic report remains valid.
+- Reports carry approximate prompt/output/total token estimates (~4
+  chars/token heuristic, labelled as such) and a malformed (non-JSON-object)
+  model response triggers exactly one bounded retry with the identical prompt;
+  hard failures are never retried.
+
 ## README maintenance rule
 
 Treat this README as the human-readable system ledger. Every commit that adds
@@ -82,6 +147,104 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-09 — Extract checker to a standalone private flake; consume it as a pinned input
+
+- **Changed:** The checker source/tests/package moved out of this repository
+  into the standalone **private** flake
+  `github:AmbitiousRealism2025/coding-tool-update-check`
+  (extracted to `/home/ambitiousrealism/coding-projects/coding-tool-update-check`,
+  README + MIT license + `.gitignore` excluding reports/state). This flake now
+  consumes it as a pinned `flake.lock` input
+  (`coding-tools-update-check.url = "github:AmbitiousRealism2025/coding-tool-update-check"`),
+  exposes it as `packages.x86_64-linux.codingToolsUpdateCheck` (built through
+  the input's overlay with this repository's pinned OpenCode CLI), and runs
+  its test suite as `checks.x86_64-linux.coding-tools-update-check`. The
+  vendored `pkgs/coding-tools-update-check*` files were removed.
+- **Standalone flake outputs:** `packages.<system>.default` (+ `checker`
+  alias), `checks.<system>.default` (unittest suite, sandboxed),
+  `formatter.<system>` (nixfmt), `overlays.default` for consumers to override
+  `opencodeCli`.
+- **Reports:** canonical reports stay at
+  `~/.local/state/coding-tool-update-check/` (`latest.md`/`latest.json`,
+  `reports/report-<stamp>.{md,json}`, `state.json`, `check.lock`); the coding
+  project's `reports/` entry is now a symlink to the state `reports/` directory
+  and is never Git-tracked.
+- **Token estimates:** reports now include approximate prompt/output/total
+  token estimates (~4 chars/token heuristic, labelled ±20%; the OpenCode event
+  stream does not expose tokenizer usage).
+- **Bounded retry:** a malformed (non-JSON-object) or empty model response
+  triggers exactly one retry with the identical prompt; timeouts/non-zero
+  exits are never retried. Attempt counts are recorded in reports.
+- **Home Manager:** `services.codingToolsUpdateCheck` gains a configurable
+  `onCalendar` option (default `"daily"`); `RandomizedDelaySec` (default 6h)
+  and `Persistent = true` are retained, as are `summarize`, `notify`,
+  `notifyOnSuccess`, and `repoRoot`.
+- **Validated:** 60 unit tests (previous 54 plus token-estimate and bounded
+  retry tests) via `nix flake check` on the standalone flake, standalone
+  package build + install check + live `--dry-run`, `nix flake check` on this
+  repository, `nix build` of the checker package from the input, and an
+  offline recovery run with a throwaway state directory. The private
+  repository was created only after a secret scan of every committed file;
+  this repository was not staged or pushed. No activation performed
+  (`sudo`/`nixos-rebuild` pending user review).
+
+### 2026-08-09 — Add the declarative coding-tool update checker
+
+- **Changed:** Added the checker (pure-Python, stdlib-only; initially vendored
+  under `pkgs/coding-tools-update-check`, later extracted to the standalone
+  private flake — see the next ledger entry) and wired it into the flake
+  (`packages`, a flake `check` running its unittest suite, and Home Manager). A persistent daily randomized user timer/service
+  (`services.codingToolsUpdateCheck` in `home/ambitiousrealism/update-checker.nix`)
+  runs it once per day at a randomized time and catches up after boot
+  (`Persistent = true`).
+- **Monitored tools (exactly the requested set):** Codex CLI and Codex Desktop,
+  T3 Code, Cursor (GUI) and the Cursor Agent CLI, Pi, and Prime Agent.
+  OpenCode/Claude/Albion/Claudex are not monitored; OpenCode is only the
+  summarization runtime.
+- **CLI:** `--force` (bypass duplicate-notification suppression, never
+  installs), `--json` (prints this run's JSON report), `--show` (prints
+  `latest.md` without a new network check), `--notify-success` (off by
+  default), `--no-notify`, `--dry-run`, `--offline`, `--list-tools`, useful
+  `--help`.
+- **Reports (exact paths):** `~/.local/state/coding-tool-update-check/latest.md`
+  and `latest.json` (always current), `reports/report-<stamp>.{md,json}` history
+  (microsecond timestamps, collision-safe), `state.json` (notification dedup;
+  versions are only marked notified after `notify-send` delivers), `check.lock`
+  (single-instance). Atomic writes throughout; retention only touches the
+  reports directory.
+- **Per-tool status:** exact states "up to date", "update available", "unable
+  to determine", "installed newer", plus release date/title/URL, Nix control
+  path, source errors, the nixpkgs three-way distinction (upstream newer vs
+  pinned nixpkgs already carrying it vs input refresh required), and release
+  detail fields (features/fixes/security/performance/breaking/deprecations/
+  migration) or explicit "unavailable".
+- **Notifications:** one notification listing genuinely newer tools; one
+  concise failure notification when every upstream check fails; partial errors
+  only recorded in the report; success notifications only with
+  `--notify-success`. Home Manager options (`summarize`, `notify`,
+  `notifyOnSuccess`) control the real service flags; the unit requests
+  network-online ordering where available.
+- **Model:** release-note summarization uses the exact runtime OpenCode model
+  `opencode/deepseek-v4-flash-free`, verified at runtime with `opencode models`;
+  non-exact models are refused (no `--summarize-model` option). A model failure
+  is reported clearly while the deterministic report remains valid.
+- **Sources:** authoritative upstreams only - GitHub `releases/latest`, the
+  pinned `codex-desktop-linux` flake input's own `flake.nix`, and
+  Cursor's official update endpoints (`api2.cursor.sh` update manifest,
+  `cursor.com/install` lab path), clearly marked informational in the report.
+- **Validated:** 54 unit tests (version ordering, tool registry, store-closure
+  suffix filtering, flake.lock parsing, per-tool states, nixpkgs distinction,
+  model verification/refusal, structured summaries, report paths, collision-safe
+  stamps, retention safety, atomic writes, duplicate + `--force` notifications,
+  all-fail failure notification, notify-failure not marking, `--show`/`--json`),
+  formatter (nixfmt), `nix flake check`, package build, full NixOS toplevel
+  build, closure inspection, and a live end-to-end run against the running
+  system closure. The checker was never launched on GUI/Electron binaries;
+  versions come from `--version` (verified headless) or store-path names only.
+- **State:** Built and validated in this repository; defined for Home Manager
+  but not activated (no `sudo`/`nixos-rebuild` performed; activation is pending
+  user review).
 
 ### 2026-08-08 — Add Prime Agent
 

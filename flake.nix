@@ -26,6 +26,11 @@
     # upstream-tested nixpkgs lock rather than changing the package underneath
     # this exact source revision.
     voxtype.url = "github:peteonrails/voxtype/8d49248baa53f29cb33007c9625a37281c72e799";
+
+    # Standalone private checker flake (source/tests/package live in the
+    # coding-tool-update-check repository; this flake only consumes it). The
+    # revision is pinned in flake.lock.
+    coding-tools-update-check.url = "git+https://github.com/AmbitiousRealism2025/coding-tool-update-check.git";
   };
 
   outputs =
@@ -36,6 +41,7 @@
       codex-desktop-linux,
       codex-nixpkgs,
       voxtype,
+      coding-tools-update-check,
       ...
     }:
     let
@@ -51,6 +57,12 @@
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
       cursorCli = unfreePkgs.cursor-cli;
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
+      codingToolsUpdateCheck =
+        (nixpkgs.legacyPackages.${system}.extend coding-tools-update-check.overlays.default)
+        .coding-tools-update-check.override
+          {
+            opencodeCli = opencode.cli;
+          };
       albion = unfreePkgs.callPackage ./pkgs/albion.nix { inherit claudeCode; };
       azeronSoftware = unfreePkgs.callPackage ./pkgs/azeron-software.nix { };
       cliproxyapi = unfreePkgs.callPackage ./pkgs/cliproxyapi.nix { };
@@ -84,11 +96,14 @@
           azeronSoftware
           claudex
           cliproxyapi
+          codingToolsUpdateCheck
           primeAgent
           swiftpointX1
           ;
         claude-code = claudeCode;
       };
+
+      checks.${system}.coding-tools-update-check = coding-tools-update-check.checks.${system}.default;
 
       # eval-config reads the release's own .version-suffix and .git-revision.
       # nixpkgs.lib.nixosSystem instead derives these fields from flake source
@@ -126,6 +141,7 @@
                 claudeCode
                 albion
                 claudex
+                codingToolsUpdateCheck
                 voxtype
                 helium
                 nemoPreview

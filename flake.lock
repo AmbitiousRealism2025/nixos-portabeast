@@ -32,6 +32,24 @@
         "url": "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1046984.104240a77242/nixexprs.tar.xz"
       }
     },
+    "coding-tools-update-check": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "lastModified": 1786286911,
+        "narHash": "sha256-aBynmXb+fgA662bkuhwmulIYqLT5zCcHrsRlGym2wug=",
+        "ref": "refs/heads/main",
+        "rev": "62572e7abd26dd53803e468a145fdd9978d6fa72",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://github.com/AmbitiousRealism2025/coding-tool-update-check.git"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://github.com/AmbitiousRealism2025/coding-tool-update-check.git"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -119,6 +137,18 @@
     },
     "nixpkgs_3": {
       "locked": {
+        "lastModified": 315532800,
+        "narHash": "sha256-rBYNiK4XmVxmJaK40DRnmoPUpCeRXJ4DJdQ/DW2LQRU=",
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/26.05/nixos-26.05.6815.531670d871c0/nixexprs.tar.xz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://releases.nixos.org/nixos/26.05/nixos-26.05.6815.531670d871c0/nixexprs.tar.xz"
+      }
+    },
+    "nixpkgs_4": {
+      "locked": {
         "lastModified": 1774386573,
         "narHash": "sha256-4hAV26quOxdC6iyG7kYaZcM3VOskcPUrdCQd/nx8obc=",
         "owner": "NixOS",
@@ -153,8 +183,9 @@
       "inputs": {
         "codex-desktop-linux": "codex-desktop-linux",
         "codex-nixpkgs": "codex-nixpkgs",
+        "coding-tools-update-check": "coding-tools-update-check",
         "home-manager": "home-manager",
-        "nixpkgs": "nixpkgs_2",
+        "nixpkgs": "nixpkgs_3",
         "nvidia-nixpkgs": "nvidia-nixpkgs",
         "voxtype": "voxtype"
       }
@@ -192,7 +223,7 @@
     "voxtype": {
       "inputs": {
         "flake-utils": "flake-utils_2",
-        "nixpkgs": "nixpkgs_3"
+        "nixpkgs": "nixpkgs_4"
       },
       "locked": {
         "lastModified": 1780004034,
