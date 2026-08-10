@@ -10,7 +10,7 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/01h214qcaw998hrfpjyaz1hklsr5j00m-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/8p5zcpn2wph68ai8awyr4s42q0nbjsf4-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
@@ -18,8 +18,8 @@ configuration and is intentionally separate from the mini PC configuration.
   and user-tested. Cursor Agent CLI is activated; its T3 provider restart and
   login test remain pending. Pi 0.84.1 is activated and tested with Codex. The
   Prime Agent 0.7.1 is activated and user-tested with Codex and ZAI. The
-  latest Codex Desktop Linux integration refresh is built but is not activated
-  on the running machine.
+  latest Codex Desktop Linux integration refresh is activated. T3 Code 0.0.33
+  is built but is not activated on the running machine.
 
 ## What this restores
 
@@ -148,6 +148,19 @@ The canonical workflow is stored in the repository's
 
 Entries are newest first. Git history remains the file-level audit trail.
 
+### 2026-08-10 — Update T3 Code to 0.0.33
+
+- **Changed:** Replace the pinned T3 Code 0.0.24 AppImage with stable 0.0.33,
+  retain the declarative Codex, Claude/Albion, and Cursor compatibility
+  launchers, and follow upstream's icon move from 1024px to 512px.
+- **Reason:** Receive the current Sidebar v2, project/worktree controls,
+  pasted-image support, usage improvements, and provider/server reliability
+  fixes from the latest stable release.
+- **Validated:** GitHub release metadata and published asset digest, fetched
+  AppImage build, packaged 0.0.33 metadata, launcher smoke check, complete NixOS
+  build, and closure comparison showing only T3 Code changed.
+- **State:** Built only; activation and in-app provider tests remain pending.
+
 ### 2026-08-10 — Refresh the Codex Desktop Linux integration
 
 - **Changed:** Advance the pinned `codex-desktop-linux` input from
@@ -158,8 +171,9 @@ Entries are newest first. Git history remains the file-level audit trail.
   underlying OpenAI application release is already current.
 - **Validated:** Named-input lock update, complete NixOS build from fetched
   sources, and closure comparison showing only `codex-desktop` changed.
-- **State:** Built only; activation and application smoke testing remain
-  pending.
+- **State:** Activated; the new launcher correctly detected and rejected an
+  older still-running Codex process, which must be closed before the refreshed
+  app can start.
 
 ### 2026-08-09 — Extract checker to a standalone private flake; consume it as a pinned input
 
