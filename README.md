@@ -10,7 +10,7 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/8p5zcpn2wph68ai8awyr4s42q0nbjsf4-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/id8yig70ccw3yiw324d0qkdj8ws8q20r-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
@@ -18,8 +18,9 @@ configuration and is intentionally separate from the mini PC configuration.
   and user-tested. Cursor Agent CLI is activated; its T3 provider restart and
   login test remain pending. Pi 0.84.1 is activated and tested with Codex. The
   Prime Agent 0.7.1 is activated and user-tested with Codex and ZAI. The
-  latest Codex Desktop Linux integration refresh is activated. T3 Code 0.0.33
-  is built but is not activated on the running machine.
+  latest Codex Desktop Linux integration refresh and T3 Code 0.0.33 are
+  activated. OpenCode CLI and Desktop 1.18.16 are built but are not activated
+  on the running machine.
 
 ## What this restores
 
@@ -147,6 +148,22 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-10 — Update OpenCode CLI and Desktop to 1.18.16
+
+- **Changed:** Pin the official OpenCode 1.18.16 CLI archive and Desktop
+  AppImage with their verified release hashes. The CLI wrapper preserves its
+  embedded Bun standalone payload byte-for-byte and invokes it with Nix's
+  dynamic loader.
+- **Reason:** Update both OpenCode interfaces together from CLI 1.15.10 and
+  Desktop 1.18.12 to the latest stable release, including configuration,
+  project registration, project-menu, directory-picker, translation, and
+  macOS window-behavior fixes.
+- **Validated:** Package install check, CLI version, Desktop launcher and icon,
+  `opencode/deepseek-v4-flash-free` model discovery, complete NixOS build, and
+  closure comparison limited to OpenCode and the dependent update checker.
+- **State:** Built only; activation and interactive CLI/Desktop tests remain
+  pending.
 
 ### 2026-08-10 — Update T3 Code to 0.0.33
 
