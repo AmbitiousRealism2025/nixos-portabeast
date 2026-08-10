@@ -6,11 +6,11 @@ configuration and is intentionally separate from the mini PC configuration.
 
 ## Current validated snapshot
 
-- **Last reviewed:** 2026-08-08
+- **Last reviewed:** 2026-08-10
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/2mfk50jrzy1kmwshwc43ga07lpnijihr-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/01h214qcaw998hrfpjyaz1hklsr5j00m-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
@@ -18,8 +18,8 @@ configuration and is intentionally separate from the mini PC configuration.
   and user-tested. Cursor Agent CLI is activated; its T3 provider restart and
   login test remain pending. Pi 0.84.1 is activated and tested with Codex. The
   Prime Agent 0.7.1 is activated and user-tested with Codex and ZAI. The
-  repository-only Codex refresh remains built but is not activated on the
-  running machine.
+  latest Codex Desktop Linux integration refresh is built but is not activated
+  on the running machine.
 
 ## What this restores
 
@@ -147,6 +147,19 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-10 — Refresh the Codex Desktop Linux integration
+
+- **Changed:** Advance the pinned `codex-desktop-linux` input from
+  `d48fa56a` to `d00ee708`, retaining OpenAI Codex Desktop `26.803.41515` while
+  adding the current Linux watcher, Computer Use, plugin, performance,
+  conversation-deletion, and security-related integration fixes.
+- **Reason:** Bring the Linux compatibility layer up to date even though the
+  underlying OpenAI application release is already current.
+- **Validated:** Named-input lock update, complete NixOS build from fetched
+  sources, and closure comparison showing only `codex-desktop` changed.
+- **State:** Built only; activation and application smoke testing remain
+  pending.
 
 ### 2026-08-09 — Extract checker to a standalone private flake; consume it as a pinned input
 
