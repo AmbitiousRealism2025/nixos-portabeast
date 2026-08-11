@@ -17,7 +17,9 @@ This list reflects the declarative configuration in
 | `Super` + `Ctrl` + `L` | Lock the session |
 | `Super` + `Ctrl` + `V` | Toggle clipboard history |
 | `Super` + `Ctrl` + `Space` | Open wallpaper controls |
-| `Print Screen` | Select a region, save it, and copy it to the clipboard |
+| `Print Screen` | Select a region, annotate it in Satty, save, and copy |
+| `Shift` + `Print Screen` | Capture all displays and annotate in Satty |
+| `Super` + `Print Screen` | Capture the active window and annotate in Satty |
 
 ## Window management
 

@@ -10,7 +10,7 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/mfgz1k17ajqksl81780xh2h33msh02gx-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/pqzz5vc33ppzkwcw2j038lvkgcn02nwq-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, plus a validated unified ChatGPT/Codex Desktop `26.803.81509`
   update on `agent/update-chatgpt-desktop`
@@ -21,7 +21,7 @@ configuration and is intentionally separate from the mini PC configuration.
   previous Codex Desktop Linux integration refresh and T3 Code 0.0.33 are
   activated. OpenCode CLI and Desktop 1.18.16 plus Cursor Agent
   2026.08.04-aaa8809 are activated and user-tested. Unified ChatGPT/Codex
-  Desktop 26.803.81509 is built but not yet activated or user-tested.
+  Desktop 26.803.81509 is activated and running.
 
 ## What this restores
 
@@ -150,6 +150,31 @@ The canonical workflow is stored in the repository's
 
 Entries are newest first. Git history remains the file-level audit trail.
 
+### 2026-08-11 — Add Chrome for Keychron Launcher
+
+- **Changed:** Install Google Chrome 151.0.7922.71, add a dedicated Keychron
+  Launcher menu entry, and grant the active local session access to Keychron
+  vendor `3434` raw-HID devices through a narrowly scoped udev rule.
+- **Reason:** Enable the Chrome WebHID connection required by Keychron's
+  browser-based keyboard configuration utility on Linux.
+- **Validated:** Chrome package evaluation and executable name, desktop-entry
+  generation, udev-rule evaluation, complete NixOS build, and secret scans.
+- **State:** Built only; activation, keyboard reconnect, and Launcher device
+  pairing remain pending.
+
+### 2026-08-11 — Add Satty screenshot and annotation workflow
+
+- **Changed:** Replace the basic region-only capture helper with a
+  Grim/Slurp/Satty workflow for annotated region, full-display, and active-window
+  screenshots. Completed captures are saved under `Pictures/Screenshots` and
+  copied to the Wayland clipboard.
+- **Reason:** Provide a polished, Wayland-native screenshot tool with arrows,
+  text, highlighting, cropping, and blur under Hyprland.
+- **Validated:** Nix evaluation, generated Satty configuration, shell helper,
+  declarative keybindings, complete NixOS build, and secret scans.
+- **State:** Built only; activation and interactive screenshot tests remain
+  pending.
+
 ### 2026-08-11 — Update to unified ChatGPT/Codex Desktop
 
 - **Changed:** Advance `codex-desktop-linux` from `d00ee708` to `76ea570f`,
@@ -162,8 +187,8 @@ Entries are newest first. Git history remains the file-level audit trail.
 - **Validated:** Named-input-only lock update, official DMG hash and build
   provenance, executable launcher, ChatGPT desktop metadata, pinned Codex CLI
   path, complete NixOS build, and closure comparison.
-- **State:** Built only; activation, sign-in, and interactive Chat/Work/Codex
-  tests remain pending.
+- **State:** Activated and running; the stale previous-version process was
+  closed and the new ChatGPT window was verified under Hyprland.
 
 ### 2026-08-11 — Refresh Cursor Agent, expose OpenCode, and document shortcuts
 

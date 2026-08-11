@@ -25,6 +25,21 @@
     exec = "zen --new-window https://wallhaven.cc/";
     icon = "web-browser";
     terminal = false;
-    categories = [ "Network" "WebBrowser" ];
+    categories = [
+      "Network"
+      "WebBrowser"
+    ];
+  };
+
+  xdg.desktopEntries.keychron-launcher = {
+    name = "Keychron Launcher";
+    comment = "Configure a Keychron keyboard with Chrome WebHID";
+    exec = "/run/current-system/sw/bin/google-chrome-stable --new-window https://launcher.keychron.com/";
+    icon = "input-keyboard";
+    terminal = false;
+    categories = [
+      "Settings"
+      "HardwareSettings"
+    ];
   };
 }
