@@ -27,6 +27,10 @@
     # this exact source revision.
     voxtype.url = "github:peteonrails/voxtype/8d49248baa53f29cb33007c9625a37281c72e799";
 
+    # Herdr publishes an official source-building Nix flake. Pin its stable
+    # release tag and retain the upstream-tested Rust and nixpkgs inputs.
+    herdr.url = "github:ogulcancelik/herdr/v0.7.5";
+
     # Standalone private checker flake (source/tests/package live in the
     # coding-tool-update-check repository; this flake only consumes it). The
     # revision is pinned in flake.lock.
@@ -41,6 +45,7 @@
       codex-desktop-linux,
       codex-nixpkgs,
       voxtype,
+      herdr,
       coding-tools-update-check,
       ...
     }:
@@ -135,6 +140,7 @@
             environment.systemPackages = [
               codexCli
               cursorCli
+              herdr.packages.${system}.default
               opencode.cli
             ];
             home-manager.extraSpecialArgs = {

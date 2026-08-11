@@ -10,7 +10,7 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/pqzz5vc33ppzkwcw2j038lvkgcn02nwq-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/92psm8sqv0iq318al015fg4f2zj0838w-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, plus a validated unified ChatGPT/Codex Desktop `26.803.81509`
   update on `agent/update-chatgpt-desktop`
@@ -149,6 +149,18 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-11 — Add Herdr agent multiplexer
+
+- **Changed:** Pin Herdr `v0.7.5` through its official Nix flake and expose the
+  `herdr` command system-wide.
+- **Reason:** Add a persistent terminal workspace manager for coordinating the
+  installed Codex, Claude, Pi, OpenCode, Cursor, Grok, and other coding agents.
+- **Validated:** Official release tag and flake outputs, source build,
+  executable version, complete NixOS build, closure comparison, and secret
+  scans.
+- **State:** Built only; activation and interactive agent-session testing
+  remain pending.
 
 ### 2026-08-11 — Add Chrome for Keychron Launcher
 
