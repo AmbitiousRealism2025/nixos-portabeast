@@ -6,11 +6,11 @@ configuration and is intentionally separate from the mini PC configuration.
 
 ## Current validated snapshot
 
-- **Last reviewed:** 2026-08-10
+- **Last reviewed:** 2026-08-11
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/id8yig70ccw3yiw324d0qkdj8ws8q20r-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/9zgkdq40l3anfq8g5bxpwclq5ql4xg15-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, with Codex Desktop
   `26.803.41515` and the Zen FFmpeg compatibility fix
@@ -19,8 +19,9 @@ configuration and is intentionally separate from the mini PC configuration.
   login test remain pending. Pi 0.84.1 is activated and tested with Codex. The
   Prime Agent 0.7.1 is activated and user-tested with Codex and ZAI. The
   latest Codex Desktop Linux integration refresh and T3 Code 0.0.33 are
-  activated. OpenCode CLI and Desktop 1.18.16 are built but are not activated
-  on the running machine.
+  activated. OpenCode CLI and Desktop 1.18.16 plus Cursor Agent
+  2026.08.04-aaa8809 are built but the new system-PATH placement and Cursor
+  ACP behavior are not yet activated and user-tested.
 
 ## What this restores
 
@@ -148,6 +149,24 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-11 — Refresh Cursor Agent, expose OpenCode, and document shortcuts
+
+- **Changed:** Replace the May 16 nixpkgs Cursor Agent with Cursor's official
+  August 4 release, rebuild T3 Code against it, promote OpenCode CLI 1.18.16 to
+  the system PATH, and add `HYPRLAND_SHORTCUTS.md` from the declarative
+  bindings.
+- **Reason:** Make OpenCode available in ordinary shells and address T3's
+  Cursor ACP-only `Upgrade your plan to continue` response with the current
+  upstream CLI. The same paid Pro+ account works in Cursor Desktop and direct
+  Cursor Agent requests; its login, model catalog, and subscription metadata
+  are healthy, while the failure is confined to the older ACP path used by T3.
+- **Validated:** Official Cursor installer URL and archive hash, package install
+  check, Cursor version/login/Grok High Fast request, OpenCode PATH version,
+  T3 package rebuild, complete NixOS build, and closure comparison limited to
+  Cursor Agent.
+- **State:** Built only; activation, a fresh shell, and an interactive Cursor
+  turn in restarted T3 Code remain pending.
 
 ### 2026-08-10 — Update OpenCode CLI and Desktop to 1.18.16
 

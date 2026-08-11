@@ -55,7 +55,7 @@
         config.allowUnfree = true;
       };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
-      cursorCli = unfreePkgs.cursor-cli;
+      cursorCli = unfreePkgs.callPackage ./pkgs/cursor-agent.nix { };
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
       codingToolsUpdateCheck =
         (nixpkgs.legacyPackages.${system}.extend coding-tools-update-check.overlays.default)
@@ -135,6 +135,7 @@
             environment.systemPackages = [
               codexCli
               cursorCli
+              opencode.cli
             ];
             home-manager.extraSpecialArgs = {
               inherit
