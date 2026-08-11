@@ -10,18 +10,18 @@ configuration and is intentionally separate from the mini PC configuration.
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/9zgkdq40l3anfq8g5bxpwclq5ql4xg15-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/mfgz1k17ajqksl81780xh2h33msh02gx-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
-  `main`, with Codex Desktop
-  `26.803.41515` and the Zen FFmpeg compatibility fix
+  `main`, plus a validated unified ChatGPT/Codex Desktop `26.803.81509`
+  update on `agent/update-chatgpt-desktop`
 - **Activation state:** The Albion permission compatibility fix is activated
-  and user-tested. Cursor Agent CLI is activated; its T3 provider restart and
-  login test remain pending. Pi 0.84.1 is activated and tested with Codex. The
+  and user-tested. Cursor Agent CLI is activated and user-tested with T3 Code.
+  Pi 0.84.1 is activated and tested with Codex. The
   Prime Agent 0.7.1 is activated and user-tested with Codex and ZAI. The
-  latest Codex Desktop Linux integration refresh and T3 Code 0.0.33 are
+  previous Codex Desktop Linux integration refresh and T3 Code 0.0.33 are
   activated. OpenCode CLI and Desktop 1.18.16 plus Cursor Agent
-  2026.08.04-aaa8809 are built but the new system-PATH placement and Cursor
-  ACP behavior are not yet activated and user-tested.
+  2026.08.04-aaa8809 are activated and user-tested. Unified ChatGPT/Codex
+  Desktop 26.803.81509 is built but not yet activated or user-tested.
 
 ## What this restores
 
@@ -150,6 +150,21 @@ The canonical workflow is stored in the repository's
 
 Entries are newest first. Git history remains the file-level audit trail.
 
+### 2026-08-11 — Update to unified ChatGPT/Codex Desktop
+
+- **Changed:** Advance `codex-desktop-linux` from `d00ee708` to `76ea570f`,
+  updating the converted official OpenAI desktop application from
+  `26.803.41515` to `26.803.81509`. The application launcher is now named
+  ChatGPT and retains the pinned Codex CLI path and Linux integration.
+- **Reason:** Adopt OpenAI's unified desktop application containing Chat,
+  Work, and Codex while continuing to use the community Linux compatibility
+  layer because OpenAI does not publish a native Linux package.
+- **Validated:** Named-input-only lock update, official DMG hash and build
+  provenance, executable launcher, ChatGPT desktop metadata, pinned Codex CLI
+  path, complete NixOS build, and closure comparison.
+- **State:** Built only; activation, sign-in, and interactive Chat/Work/Codex
+  tests remain pending.
+
 ### 2026-08-11 — Refresh Cursor Agent, expose OpenCode, and document shortcuts
 
 - **Changed:** Replace the May 16 nixpkgs Cursor Agent with Cursor's official
@@ -165,8 +180,8 @@ Entries are newest first. Git history remains the file-level audit trail.
   check, Cursor version/login/Grok High Fast request, OpenCode PATH version,
   T3 package rebuild, complete NixOS build, and closure comparison limited to
   Cursor Agent.
-- **State:** Built only; activation, a fresh shell, and an interactive Cursor
-  turn in restarted T3 Code remain pending.
+- **State:** Activated and user-tested; Cursor and OpenCode both work after
+  restarting into the new environment.
 
 ### 2026-08-10 — Update OpenCode CLI and Desktop to 1.18.16
 
