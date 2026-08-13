@@ -20,7 +20,7 @@
     # Persist the community desktop wrapper and pin the same official Codex
     # CLI version that was proven during bootstrap.
     codex-desktop-linux.url = "github:ilysenko/codex-desktop-linux";
-    codex-nixpkgs.url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1046984.104240a77242/nixexprs.tar.xz";
+    codex-nixpkgs.url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1052792.044bfe75bfe4/nixexprs.tar.xz";
 
     # Pin the reviewed, signed Voxtype v0.7.5 release commit. Keep its own
     # upstream-tested nixpkgs lock rather than changing the package underneath
@@ -60,6 +60,7 @@
         config.allowUnfree = true;
       };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
+      cursorGui = unfreePkgs.callPackage ./pkgs/cursor-gui.nix { };
       cursorCli = unfreePkgs.callPackage ./pkgs/cursor-agent.nix { };
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
       codingToolsUpdateCheck =
@@ -86,7 +87,7 @@
       piCli = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/pi-coding-agent.nix { };
       primeAgentRuntime = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent-runtime.nix { };
       primeAgent = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent.nix {
-        inherit primeAgentRuntime;
+        inherit codexCli primeAgentRuntime;
       };
       swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix {
@@ -121,6 +122,7 @@
             albion
             azeronSoftware
             claudex
+            cursorGui
             helium
             nemoPreview
             nvidiaPkgs
@@ -149,6 +151,7 @@
                 albion
                 claudex
                 codingToolsUpdateCheck
+                cursorGui
                 voxtype
                 helium
                 nemoPreview

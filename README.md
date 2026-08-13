@@ -6,22 +6,24 @@ configuration and is intentionally separate from the mini PC configuration.
 
 ## Current validated snapshot
 
-- **Last reviewed:** 2026-08-11
+- **Last reviewed:** 2026-08-13
 - **Flake configuration:** `nixos`
 - **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
 - **Last complete build:**
-  `/nix/store/92psm8sqv0iq318al015fg4f2zj0838w-nixos-system-nixos-26.05.6815.531670d871c0`
+  `/nix/store/5gacx0qdcf2bnp1v8906g1d887llchqq-nixos-system-nixos-26.05.6815.531670d871c0`
 - **Repository state:** Complete private recovery configuration on GitHub
   `main`, plus a validated unified ChatGPT/Codex Desktop `26.803.81509`
   update on `agent/update-chatgpt-desktop`
 - **Activation state:** The Albion permission compatibility fix is activated
   and user-tested. Cursor Agent CLI is activated and user-tested with T3 Code.
   Pi 0.84.1 is activated and tested with Codex. The
-  Prime Agent 0.7.1 is activated and user-tested with Codex and ZAI. The
+  Prime Agent 0.7.2 is activated; Prime Agent 0.7.1 was user-tested with Codex
+  and ZAI. The
   previous Codex Desktop Linux integration refresh and T3 Code 0.0.33 are
-  activated. OpenCode CLI and Desktop 1.18.16 plus Cursor Agent
-  2026.08.04-aaa8809 are activated and user-tested. Unified ChatGPT/Codex
-  Desktop 26.803.81509 is activated and running.
+  activated. OpenCode CLI and Desktop 1.18.16 are activated and user-tested.
+  Codex CLI 0.147.0, Cursor 3.15.19, and Cursor Agent
+  2026.08.11-e8db854 are activated. Unified ChatGPT/Codex Desktop
+  26.803.81509 is activated and running.
 
 ## What this restores
 
@@ -149,6 +151,19 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-13 — Refresh reported coding tools
+
+- **Changed:** Update Codex CLI to 0.147.0, Cursor to 3.15.19, Cursor Agent to
+  `2026.08.11-e8db854`, and Prime Agent plus its Python runtime to 0.7.2.
+- **Reason:** Apply the four updates reported by the declarative coding-tool
+  update checker without advancing the OS-wide nixpkgs pin.
+- **Validated:** Exact upstream artifacts and hashes, individual package builds
+  and version checks, full NixOS build, closure comparison, dry activation,
+  current-tree and full-history secret scans, and zero failed system or user
+  units after activation.
+- **State:** Activated as the current NixOS generation. Interactive application
+  workflows remain to be user-tested.
 
 ### 2026-08-11 — Add Herdr agent multiplexer
 

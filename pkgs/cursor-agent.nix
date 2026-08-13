@@ -8,11 +8,11 @@
 
 stdenv.mkDerivation {
   pname = "cursor-cli";
-  version = "2026.08.04-aaa8809";
+  version = "2026.08.11-e8db854";
 
   src = fetchurl {
-    url = "https://downloads.cursor.com/lab/2026.08.04-aaa8809/linux/x64/agent-cli-package.tar.gz";
-    hash = "sha256-4oIGjctc3WaLjOLjRWxYvhO7ZKg04a1J+FNLXNeqL+U=";
+    url = "https://downloads.cursor.com/lab/2026.08.11-e8db854/linux/x64/agent-cli-package.tar.gz";
+    hash = "sha256-v/9L9vTp3TDB0O8KcLYHewdAFd0pSOTFBoXVOv3Pzlo=";
   };
 
   sourceRoot = "dist-package";
@@ -35,7 +35,7 @@ stdenv.mkDerivation {
   doInstallCheck = true;
   installCheckPhase = ''
     runHook preInstallCheck
-    test "$(HOME="$TMPDIR" "$out/bin/cursor-agent" --version)" = "2026.08.04-aaa8809"
+    test "$(HOME="$TMPDIR" "$out/bin/cursor-agent" --version)" = "2026.08.11-e8db854"
     runHook postInstallCheck
   '';
 

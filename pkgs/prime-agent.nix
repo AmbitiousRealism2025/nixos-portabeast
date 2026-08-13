@@ -2,6 +2,7 @@
   lib,
   autoPatchelfHook,
   buildNpmPackage,
+  codexCli,
   fetchurl,
   makeBinaryWrapper,
   nodejs_22,
@@ -11,7 +12,7 @@
 }:
 
 let
-  version = "0.7.1";
+  version = "0.7.2";
   buildNpmPackageNode22 = buildNpmPackage.override { nodejs = nodejs_22; };
   pythonEnv = python3.withPackages (ps: [
     ps.beautifulsoup4
@@ -38,12 +39,12 @@ buildNpmPackageNode22 {
 
   src = fetchurl {
     url = "https://pub-728493de92a943e2a9b2d17b4719f318.r2.dev/releases/v${version}/prime-agent-${version}.tgz";
-    hash = "sha256-1oYSyDI5yq+rcsx2xVrFcr/QegWeqPvSo92+HytV3Ns=";
+    hash = "sha256-vFRx8qYm1ye4ikXrdF//k7EMVUo8T8WRLyXYxkuYf14=";
   };
   sourceRoot = "package";
 
   npmDepsFetcherVersion = 2;
-  npmDepsHash = "sha256-e06SFd9rb8BW31EOaAtDTcjjcFuwN/MBnl6w7mJvEK4=";
+  npmDepsHash = "sha256-1XN+j9uS/xv9P33AOtepGJXccPH+r0bk5UicQqJfb3A=";
   npmFlags = [ "--omit=optional" ];
 
   postPatch = ''
@@ -64,16 +65,16 @@ buildNpmPackageNode22 {
       ! -path '*/linux/x64/node/glibc-127-Release/addon.node' \
       -delete
 
-    # Temporary 0.7.1 hotfix: the Codex model-discovery endpoint treats
-    # Prime's package version as an obsolete Codex client version and returns
+    # The Codex model-discovery endpoint treats Prime's package version as an
+    # obsolete Codex client version and returns
     # an empty catalog. Use the installed Codex CLI protocol version until
     # upstream decouples these versions; otherwise RLM cannot select sibling
     # OpenAI-Codex subscription models such as GPT-5.6 Luna.
-    codex_catalog_bundle="$out/lib/node_modules/prime-agent/dist/bundle/chunk-PNKBOUZJ.js"
+    codex_catalog_bundle="$out/lib/node_modules/prime-agent/dist/bundle/chunk-CAY2X72A.js"
     substituteInPlace "$codex_catalog_bundle" \
       --replace-fail \
       'url2.searchParams.set("client_version", VERSION);' \
-      'url2.searchParams.set("client_version", "0.146.0");'
+      'url2.searchParams.set("client_version", "${codexCli.version}");'
   '';
 
   postFixup = ''
