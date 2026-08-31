@@ -1,19 +1,21 @@
 # nixos-portabeast
 
-Private, declarative NixOS configuration for the **Portabeast**, a ThinkPad P1
+Public, declarative NixOS configuration for the **Portabeast**, a ThinkPad P1
 Gen 4. This repository is the off-machine backup of the working `/etc/nixos`
-configuration and is intentionally separate from the mini PC configuration.
+configuration. A fresh AMD host will be added as a separate flake output; see
+`README-AMD.md` for the audited handoff and hardware boundaries.
 
 ## Current validated snapshot
 
-- **Last reviewed:** 2026-08-13
+- **Last reviewed:** 2026-08-31
 - **Flake configuration:** `nixos`
-- **Live history synchronized through:** `b502244` (`Add Azeron Software 2.0.1`)
-- **Last complete build:**
-  `/nix/store/5gacx0qdcf2bnp1v8906g1d887llchqq-nixos-system-nixos-26.05.6815.531670d871c0`
-- **Repository state:** Complete private recovery configuration on GitHub
-  `main`, plus a validated unified ChatGPT/Codex Desktop `26.803.81509`
-  update on `agent/update-chatgpt-desktop`
+- **Base recovery history synchronized through:** `b502244`
+- **Pending Portabeast history merged through:** `306a439`
+- **Last complete review-branch build:**
+  `/nix/store/k9i5kj0aqcabg26q8bmkwfbi1lwcsmyq-nixos-system-nixos-26.05.6815.531670d871c0`
+- **Repository state:** Public recovery configuration on GitHub `main`, plus a
+  validated review branch that merges the pending Portabeast tool history,
+  updates Codex Desktop to `26.825.51511`, and documents the AMD handoff
 - **Activation state:** The Albion permission compatibility fix is activated
   and user-tested. Cursor Agent CLI is activated and user-tested with T3 Code.
   Pi 0.84.1 is activated and tested with Codex. The
@@ -23,7 +25,8 @@ configuration and is intentionally separate from the mini PC configuration.
   activated. OpenCode CLI and Desktop 1.18.16 are activated and user-tested.
   Codex CLI 0.147.0, Cursor 3.15.19, and Cursor Agent
   2026.08.11-e8db854 are activated. Unified ChatGPT/Codex Desktop
-  26.803.81509 is activated and running.
+  26.803.81509 is activated and running. The 2026-08-31 review branch is built
+  only and has not been activated.
 
 ## What this restores
 
@@ -151,6 +154,22 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-31: Reconcile pending history and prepare the AMD handoff
+
+- **Changed:** Merge the ten commits left on `agent/install-prime-agent`, add
+  the fresh AMD installation handoff, and advance only the
+  `codex-desktop-linux` lock node to the versioned Linux package
+  `26.825.51511`.
+- **Reason:** Bring the public recovery repository up to date without replacing
+  the ThinkPad output with the uncommitted AMD migration overlay. The previous
+  Codex input referenced a mutable desktop artifact that no longer matched its
+  locked hash.
+- **Validated:** Flake evaluation, complete ThinkPad system build, closure
+  comparison, and current-tree plus full-history secret scans. The AMD host
+  still requires installer-generated hardware declarations and its own output.
+- **State:** Built only. No activation was performed. See `README-AMD.md`
+  before installing on the new AMD drive.
 
 ### 2026-08-13 — Refresh reported coding tools
 
