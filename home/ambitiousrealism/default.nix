@@ -14,6 +14,7 @@
     ./shell.nix
     ./t3code.nix
     ./traycer.nix
+    ./update-checker.nix
     ./voxtype.nix
   ];
 
@@ -34,4 +35,9 @@
     unzip
     p7zip
   ];
+
+  # Daily randomized persistent user timer/service for the coding-tool
+  # update checker (see update-checker.nix for the report paths).
+  services.codingToolsUpdateCheck.enable = true;
+
 }

@@ -6,14 +6,14 @@
 
 python3Packages.buildPythonPackage rec {
   pname = "prime-agent-runtime";
-  version = "0.7.1";
+  version = "0.7.2";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "PrimeIntellect-ai";
     repo = "prime-agent";
     tag = "v${version}";
-    hash = "sha256-TaDa5Iflg6eGW9Hzd6alAcwF8PU0SBG2MCLiM313YqY=";
+    hash = "sha256-rOKFkKoV2Mfg2wHioZ+2Eo3Js6C4489hxTxVu38cgbA=";
   };
 
   sourceRoot = "${src.name}/prime-agent-runtime";

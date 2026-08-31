@@ -1,10 +1,9 @@
-{ pkgs, ... }:
+{ cursorGui, pkgs, ... }:
 
 {
   # Cursor is the selected graphical/terminal editor. Kate remains installed
   # by NixOS as a Plasma-safe fallback.
-  home.packages = with pkgs; [
-    code-cursor
+  home.packages = [ cursorGui ] ++ (with pkgs; [
     thunderbird
     discord
 
@@ -26,7 +25,7 @@
     inter
     fira-code
     nerd-fonts.jetbrains-mono
-  ];
+  ]);
 
   home.sessionVariables = {
     EDITOR = "cursor --wait";
