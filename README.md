@@ -46,9 +46,11 @@ package definitions under `pkgs/`.
 ## What this does not back up
 
 This repository does not contain home-directory data, application state,
-browser profiles, login sessions, password-vault contents, Tailscale identity,
-or locally generated Albion/Claudex credentials. Those remain outside the Nix
-store and need their own backup or a fresh login/setup after restoration.
+browser profiles, login sessions, password-vault contents, or Tailscale node
+identity. The portable Albion and Claudex credential files have a separate,
+encrypted recovery copy in the `NixOS Common` 1Password vault. They remain
+outside Git and the Nix store. See `README-AMD.md` for the restore commands and
+the limits of that point-in-time copy.
 
 ## Validation and activation
 
@@ -154,6 +156,21 @@ The canonical workflow is stored in the repository's
 ## Significant change ledger
 
 Entries are newest first. Git history remains the file-level audit trail.
+
+### 2026-08-31: Add external 1Password recovery organization
+
+- **Changed:** Record the `NixOS Common`, `NixOS ThinkPad`, and `NixOS AMD`
+  vault roles, the AMD installer authentication path, and the commands for
+  restoring portable Albion and Claudex credential documents.
+- **Reason:** Let a fresh AMD installation authenticate to the private flake
+  input and recover approved application credentials without putting secret
+  values in Git, shell history, command arguments, or the Nix store.
+- **Validated:** Confirmed the stored GitHub credential exactly matches the
+  active credential and authenticates successfully. Downloaded each recovery
+  document through a digest-only comparison and confirmed exact byte matches.
+- **State:** External vault organization is active. The Tailscale enrollment
+  item remains empty until a new AMD-specific key is issued. No NixOS output
+  was activated.
 
 ### 2026-08-31: Reconcile pending history and prepare the AMD handoff
 

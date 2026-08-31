@@ -111,18 +111,79 @@ sudo nixos-rebuild dry-activate --flake .#amd
 sudo nixos-rebuild switch --flake .#amd
 ```
 
+## Bootstrap access through 1Password
+
+The recovery account has three dedicated vaults:
+
+- `NixOS Common` holds credentials and recovery documents approved for both
+  machines.
+- `NixOS ThinkPad` holds ThinkPad-only recovery metadata.
+- `NixOS AMD` holds the AMD bootstrap note and AMD-only recovery metadata.
+
+From the NixOS installer, start a temporary shell containing 1Password CLI and
+GitHub CLI:
+
+```sh
+NIXPKGS_ALLOW_UNFREE=1 nix \
+  --extra-experimental-features 'nix-command flakes' \
+  shell --impure nixpkgs#_1password-cli nixpkgs#gh
+```
+
+Inside that shell, add the 1Password account and sign in. Enter the account
+password and Secret Key only into the local terminal:
+
+```sh
+op account add
+eval "$(op signin)"
+```
+
+Load the GitHub token directly from the concealed 1Password field into GitHub
+CLI. The token is not printed or placed in shell history:
+
+```sh
+op read 'op://NixOS Common/GitHub NixOS Repository Access/credential' |
+  gh auth login --hostname github.com --with-token
+gh auth setup-git
+```
+
+GitHub access is required because the public NixOS flake currently consumes a
+private `coding-tool-update-check` input. The stored token is the current
+bootstrap credential. Replace it later with a fine-grained, read-only token
+for that private repository if possible.
+
+After the first boot, the portable Albion and Claudex recovery files can be
+restored without sending their contents through the terminal:
+
+```sh
+install -d -m 0700 ~/.albion ~/.config/claudex/codex-accounts
+op document get 'Albion Secrets File' --vault 'NixOS Common' \
+  --out-file ~/.albion/secrets.sh --file-mode 0600
+op document get 'Claudex Environment' --vault 'NixOS Common' \
+  --out-file ~/.config/claudex/env --file-mode 0600
+op document get 'Claudex Managed Codex Account' --vault 'NixOS Common' \
+  --out-file ~/.config/claudex/codex-accounts/codex-claudex-managed.json \
+  --file-mode 0600
+op document get 'Claudex Proxy Configuration' --vault 'NixOS Common' \
+  --out-file ~/.config/claudex/cliproxyapi.yaml --file-mode 0600
+```
+
+These documents are a point-in-time recovery copy from 2026-08-31. Tokens may
+expire or require a fresh application login. Review restored files before
+starting the applications.
+
+The `Tailscale Enrollment` item exists in `NixOS Common`, but its credential
+field is intentionally empty. Issue a new reusable or ephemeral enrollment
+key for the AMD host. Never restore the ThinkPad's `tailscaled.state`, because
+that would duplicate its node identity.
+
 ## Access and public-repository warning
 
 This repository is public. Never commit private keys, access tokens, password
 hashes, `.env` files, browser profiles, login sessions, application state, or
 generated credentials.
 
-The flake currently consumes
-`AmbitiousRealism2025/coding-tool-update-check`, which the repository ledger
-describes as private. A clean AMD install therefore needs GitHub credentials
-that can read that input, or the checker must be made public, removed, or made
-optional before an unauthenticated build can work. Resolve that deliberately;
-do not embed a token in the flake URL or commit credentials.
+Do not embed a token in a flake URL, Nix expression, command argument, or
+committed environment file. Use the 1Password secret reference above.
 
 ## Audit status on 2026-08-31
 
@@ -136,4 +197,3 @@ do not embed a token in the flake URL or commit credentials.
 - The complete ThinkPad output builds successfully at
   `/nix/store/k9i5kj0aqcabg26q8bmkwfbi1lwcsmyq-nixos-system-nixos-26.05.6815.531670d871c0`.
 - No output from this review branch was activated.
-
