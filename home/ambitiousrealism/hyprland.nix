@@ -17,28 +17,56 @@ let
     ];
   };
 
-  screenshotRegion = pkgs.writeShellApplication {
-    name = "screenshot-region";
+  screenshotTool = pkgs.writeShellApplication {
+    name = "hypr-screenshot";
     runtimeInputs = with pkgs; [
       coreutils
       grim
+      hyprland
+      jq
+      libnotify
+      satty
       slurp
       wl-clipboard
-      libnotify
       xdg-user-dirs
     ];
     text = ''
-      region="$(slurp)" || exit 0
-      [ -n "$region" ] || exit 0
+      mode="''${1:-region}"
+      geometry=""
+
+      case "$mode" in
+        region)
+          geometry="$(slurp)" || exit 0
+          [ -n "$geometry" ] || exit 0
+          ;;
+        window)
+          geometry="$(hyprctl -j activewindow | jq -er '
+            select(.mapped == true)
+            | "\(.at[0]),\(.at[1]) \(.size[0])x\(.size[1])"
+          ')" || exit 0
+          ;;
+        full)
+          ;;
+        *)
+          echo "Usage: hypr-screenshot {region|window|full}" >&2
+          exit 2
+          ;;
+      esac
 
       pictures="$(xdg-user-dir PICTURES)"
       output_dir="$pictures/Screenshots"
       mkdir -p "$output_dir"
       output="$output_dir/$(date +%Y-%m-%d_%H-%M-%S).png"
 
-      grim -g "$region" "$output"
-      wl-copy < "$output"
-      notify-send "Screenshot saved" "$output"
+      if [ -n "$geometry" ]; then
+        grim -g "$geometry" -t ppm -
+      else
+        grim -t ppm -
+      fi | satty --filename - --output-filename "$output"
+
+      if [ -s "$output" ]; then
+        notify-send "Screenshot saved and copied" "$output"
+      fi
     '';
   };
 
@@ -124,9 +152,22 @@ in
     brightnessctl
     clamshellMonitor
     fuzzel
-    screenshotRegion
+    satty
+    screenshotTool
   ];
   home.sessionVariables.TERMINAL = "kitty";
+
+  xdg.configFile."satty/config.toml".text = ''
+    [general]
+    fullscreen = true
+    floating-hack = true
+    copy-command = "wl-copy"
+    output-filename = "~/Pictures/Screenshots/satty-%Y-%m-%d_%H-%M-%S.png"
+    save-after-copy = true
+    actions-on-enter = ["save-to-clipboard", "exit"]
+    actions-on-escape = ["exit"]
+    initial-tool = "pointer"
+  '';
 
   programs.kitty = {
     enable = true;
@@ -284,9 +325,11 @@ in
         (mkExecBind "SUPER + CTRL + V" "${pkgs.dms-shell}/bin/dms ipc call clipboard toggle")
         (mkExecBind "SUPER + CTRL + SPACE" "${pkgs.dms-shell}/bin/dms ipc call dankdash wallpaper")
 
-        # Omarchy's region-capture workflow: save under XDG Pictures, copy the
-        # PNG to the clipboard, and show the final path in a notification.
-        (mkExecBind "PRINT" "${screenshotRegion}/bin/screenshot-region")
+        # Wayland-native capture and Satty annotation workflows. Enter saves
+        # under XDG Pictures/Screenshots, copies the PNG, and exits Satty.
+        (mkExecBind "PRINT" "${screenshotTool}/bin/hypr-screenshot region")
+        (mkExecBind "SHIFT + PRINT" "${screenshotTool}/bin/hypr-screenshot full")
+        (mkExecBind "SUPER + PRINT" "${screenshotTool}/bin/hypr-screenshot window")
 
         # Apple-shaped editing muscle memory. Hyprland translates these
         # focused-window shortcuts natively, while physical Ctrl+C remains

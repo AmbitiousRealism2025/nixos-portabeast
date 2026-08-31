@@ -13,10 +13,10 @@
 
 let
   pname = "t3code";
-  version = "0.0.24";
+  version = "0.0.33";
   src = fetchurl {
     url = "https://github.com/pingdotgg/t3code/releases/download/v${version}/T3-Code-${version}-x86_64.AppImage";
-    hash = "sha256-t8KYAtaQKWmCVOOwvHByosYoqb0Ji35Qe4m+8Gtp/+k=";
+    hash = "sha256-QVyGSPQ8PSLVcvJ/LFD9yMMQ6n/N6VN7kD4eLxyHdaE=";
   };
   appimageContents = appimageTools.extractType2 {
     inherit pname src version;
@@ -51,8 +51,8 @@ let
         ${codexCli}/bin/codex "$@"
     '';
   };
-  # T3 v0.0.24 still discovers Cursor Agent under its former `agent` command
-  # name, while the current nixpkgs package exposes `cursor-agent`.
+  # Retain the former `agent` command as a compatibility launcher while the
+  # current nixpkgs package exposes `cursor-agent`.
   cursorAgentForT3 = writeShellScriptBin "agent" ''
     exec ${cursorCli}/bin/cursor-agent "$@"
   '';
@@ -70,7 +70,8 @@ runCommand "${pname}-${version}" { meta = base.meta; } ''
   mkdir -p "$out/bin"
   ln -s ${launcher}/bin/t3code "$out/bin/t3code"
 
-  install -m 444 -D \
-    ${appimageContents}/usr/share/icons/hicolor/1024x1024/apps/t3code.png \
-    "$out/share/icons/hicolor/1024x1024/apps/t3code.png"
+  icon=${appimageContents}/usr/share/icons/hicolor/512x512/apps/t3code.png
+  test -f "$icon"
+  install -m 444 -D "$icon" \
+    "$out/share/icons/hicolor/512x512/apps/t3code.png"
 ''

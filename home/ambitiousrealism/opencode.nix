@@ -2,7 +2,6 @@
 
 {
   home.packages = [
-    opencode.cli
     opencode.desktop
   ];
 
@@ -14,6 +13,9 @@
     exec = "${opencode.desktop}/bin/opencode-desktop";
     icon = "ai.opencode.desktop";
     terminal = false;
-    categories = [ "Development" "IDE" ];
+    categories = [
+      "Development"
+      "IDE"
+    ];
   };
 }

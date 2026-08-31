@@ -1,5 +1,6 @@
 {
   config,
+  cursorGui,
   helium,
   lib,
   nvidiaPkgs,
@@ -209,7 +210,7 @@
       # DMS launches desktop entries by their Exec name. Cursor is owned by
       # Home Manager, so expose the exact same pinned package to the DMS
       # service without promoting it to the global system package list.
-      pkgs.code-cursor
+      cursorGui
       # Let DMS terminal actions and its health check resolve the already
       # proven Kitty package as well as Hyprland's absolute Kitty binding.
       pkgs.kitty

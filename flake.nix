@@ -20,12 +20,21 @@
     # Persist the community desktop wrapper and pin the same official Codex
     # CLI version that was proven during bootstrap.
     codex-desktop-linux.url = "github:ilysenko/codex-desktop-linux";
-    codex-nixpkgs.url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1046984.104240a77242/nixexprs.tar.xz";
+    codex-nixpkgs.url = "https://releases.nixos.org/nixpkgs/nixpkgs-26.11pre1052792.044bfe75bfe4/nixexprs.tar.xz";
 
     # Pin the reviewed, signed Voxtype v0.7.5 release commit. Keep its own
     # upstream-tested nixpkgs lock rather than changing the package underneath
     # this exact source revision.
     voxtype.url = "github:peteonrails/voxtype/8d49248baa53f29cb33007c9625a37281c72e799";
+
+    # Herdr publishes an official source-building Nix flake. Pin its stable
+    # release tag and retain the upstream-tested Rust and nixpkgs inputs.
+    herdr.url = "github:ogulcancelik/herdr/v0.7.5";
+
+    # Standalone private checker flake (source/tests/package live in the
+    # coding-tool-update-check repository; this flake only consumes it). The
+    # revision is pinned in flake.lock.
+    coding-tools-update-check.url = "git+https://github.com/AmbitiousRealism2025/coding-tool-update-check.git";
   };
 
   outputs =
@@ -36,6 +45,8 @@
       codex-desktop-linux,
       codex-nixpkgs,
       voxtype,
+      herdr,
+      coding-tools-update-check,
       ...
     }:
     let
@@ -49,8 +60,15 @@
         config.allowUnfree = true;
       };
       codexCli = codex-nixpkgs.legacyPackages.${system}.codex;
-      cursorCli = unfreePkgs.cursor-cli;
+      cursorGui = unfreePkgs.callPackage ./pkgs/cursor-gui.nix { };
+      cursorCli = unfreePkgs.callPackage ./pkgs/cursor-agent.nix { };
       claudeCode = unfreePkgs.callPackage ./pkgs/claude-code.nix { };
+      codingToolsUpdateCheck =
+        (nixpkgs.legacyPackages.${system}.extend coding-tools-update-check.overlays.default)
+        .coding-tools-update-check.override
+          {
+            opencodeCli = opencode.cli;
+          };
       albion = unfreePkgs.callPackage ./pkgs/albion.nix { inherit claudeCode; };
       azeronSoftware = unfreePkgs.callPackage ./pkgs/azeron-software.nix { };
       cliproxyapi = unfreePkgs.callPackage ./pkgs/cliproxyapi.nix { };
@@ -69,7 +87,7 @@
       piCli = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/pi-coding-agent.nix { };
       primeAgentRuntime = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent-runtime.nix { };
       primeAgent = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/prime-agent.nix {
-        inherit primeAgentRuntime;
+        inherit codexCli primeAgentRuntime;
       };
       swiftpointX1 = unfreePkgs.callPackage ./pkgs/swiftpoint-x1.nix { };
       t3code = nixpkgs.legacyPackages.${system}.callPackage ./pkgs/t3code.nix {
@@ -84,11 +102,14 @@
           azeronSoftware
           claudex
           cliproxyapi
+          codingToolsUpdateCheck
           primeAgent
           swiftpointX1
           ;
         claude-code = claudeCode;
       };
+
+      checks.${system}.coding-tools-update-check = coding-tools-update-check.checks.${system}.default;
 
       # eval-config reads the release's own .version-suffix and .git-revision.
       # nixpkgs.lib.nixosSystem instead derives these fields from flake source
@@ -101,6 +122,7 @@
             albion
             azeronSoftware
             claudex
+            cursorGui
             helium
             nemoPreview
             nvidiaPkgs
@@ -120,12 +142,16 @@
             environment.systemPackages = [
               codexCli
               cursorCli
+              herdr.packages.${system}.default
+              opencode.cli
             ];
             home-manager.extraSpecialArgs = {
               inherit
                 claudeCode
                 albion
                 claudex
+                codingToolsUpdateCheck
+                cursorGui
                 voxtype
                 helium
                 nemoPreview
